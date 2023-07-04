@@ -3,39 +3,68 @@
 #include "GameMain.h"
 #define STAGE_WIDTH_BLOCK 20
 #define STAGE_HEIGHT_BLOCK 15
+#define BLOCK_SIZE 32
 
 GameMain::GameMain()
 {
-	FILE* fp;
-	char buf[100];
-	int ret;
-	int h = 0;
-
-	fopen_s(&fp, "StageData/dat.txt", "r");
-
-	if (fp == NULL)
+	for (int i = 0; i < 15; i++)
 	{
-		printf("ファイル読み込みエラー\n");
-	}
-	else
-	{
-		while (fgets(buf, 100, fp) != NULL)
+		for (int j = 0; j < 20; j++)
 		{
-			ret = sscanf(buf, "%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d\n"
-				, &Stage[h][0], &Stage[h][1], &Stage[h][2], &Stage[h][3], &Stage[h][4], &Stage[h][5], &Stage[h][6], &Stage[h][7], &Stage[h][8], &Stage[h][9]
-				, &Stage[h][0], &Stage[h][11], &Stage[h][12], &Stage[h][13], &Stage[h][14], &Stage[h][15], &Stage[h][16], &Stage[h][17], &Stage[h][18], &Stage[h][19]);
-			++h;
+			Stage[i][j] = -1;
 		}
 	}
 
+	FILE* fp;
+	char buf[41];
+	int i = 0, ret;
+
+	fopen_s(&fp, "StageData/dat.txt", "r");
+	if (fp == NULL)
+	{
+		throw "LoadFile Error";
+	}
+
+	while (fgets(buf, sizeof(buf), fp) != NULL)
+	{
+		ret=sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d"
+			, &Stage[i][0], &Stage[i][1], &Stage[i][2], &Stage[i][3], &Stage[i][4], &Stage[i][5], &Stage[i][6], &Stage[i][7], &Stage[i][8], &Stage[i][9]
+			, &Stage[i][10], &Stage[i][11], &Stage[i][12], &Stage[i][13], &Stage[i][14], &Stage[i][15], &Stage[i][16], &Stage[i][17], &Stage[i][18], &Stage[i][19]);
+		i++;
+	}
 	fclose(fp);
+
+	BlockImg[0] = LoadGraph("1-1image/Block/block.png");
+	BlockImg[1] = LoadGraph("1-1image/Block/floor.png");
+	BlockImg[2] = LoadGraph("1-1image/Block/kai_block.png");
 }
 
 AbstractScene* GameMain::Update()
 {
-	return nullptr;
+
+	return this;
 }
 
 void GameMain::Draw() const
 {
+	for (int i = 0; i < STAGE_HEIGHT_BLOCK; i++)
+	{
+		for (int j = 0; j < STAGE_WIDTH_BLOCK; j++)
+		{
+			if (Stage[i][j] == 1)
+			{
+				DrawGraph(j * BLOCK_SIZE, i * BLOCK_SIZE, BlockImg[0], TRUE);
+			}
+			else if (Stage[i][j] == 2)
+			{
+				DrawGraph(j * BLOCK_SIZE, i * BLOCK_SIZE, BlockImg[1], TRUE);
+			}
+			else if (Stage[i][j] == 3)
+			{
+				DrawGraph(j * BLOCK_SIZE, i * BLOCK_SIZE, BlockImg[2], TRUE);
+			}
+		}
+	}
+
+	mario.Draw();
 }

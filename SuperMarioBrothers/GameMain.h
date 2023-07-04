@@ -1,5 +1,6 @@
 #pragma once
 #include "SceneManager.h"
+#include "Mario.h"
 class GameMain :
     public AbstractScene
 {
@@ -18,6 +19,8 @@ public:
 
 private:
 	int Stage[15][20];
-	int 
+	int BlockImg[3];
+
+	Mario mario;
 };
 
