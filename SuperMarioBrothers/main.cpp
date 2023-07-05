@@ -1,5 +1,7 @@
 #include "DxLib.h"
 #include "GameMain.h"
+#include "PadInput.h"
+
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
 
@@ -13,9 +15,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	SceneManager SceneMng(new GameMain());
 
-	while ((SceneMng.Update() != nullptr)&&(ProcessMessage() == 0))
+	while ((SceneMng.Update() != nullptr)&&(ProcessMessage() == 0)&&(PadInput::OnClick(XINPUT_BUTTON_BACK) == 0))
 	{
 		ClearDrawScreen();
+
+		PadInput::UpdateKey();
 
 		SceneMng.Draw();
 

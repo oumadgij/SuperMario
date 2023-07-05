@@ -41,6 +41,7 @@ GameMain::GameMain()
 
 AbstractScene* GameMain::Update()
 {
+	mario.Update();
 
 	return this;
 }

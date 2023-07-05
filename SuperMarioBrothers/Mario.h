@@ -1,4 +1,13 @@
 #pragma once
+
+enum class STATE
+{
+	SMALL = 0,  //ちびマリオ
+	BIG,    //でかマリオ
+	FIRE,   //ファイアマリオ
+	STAR    //無敵状態
+};
+
 class Mario
 {
 public:
@@ -9,8 +18,9 @@ public:
 	void Draw()const;
 
 private:
-	int marioImg[9];
+	int marioImg[10];
 	int x, y;
-	int i;
+	STATE state;
+	int m, n;
 };
 
