@@ -1,4 +1,6 @@
 #pragma once
+#include "CharaBase.h"
+#include "BoxCollider.h"
 
 enum class STATE
 {
@@ -8,7 +10,16 @@ enum class STATE
 	STAR    //ñ≥ìGèÛë‘
 };
 
-class Mario
+enum class MOVE_VECTOR
+{
+	STOP = 0,
+	LEFT,
+	RIGHT,
+	JUMP,
+	DOWN
+};
+
+class Mario : public CharaBase,public BoxCollider
 {
 public:
 	Mario();
@@ -16,11 +27,20 @@ public:
 
 	void Update();
 	void Draw()const;
+	virtual void Hit(int stagex, int stagey)override;
+	int GetMoveVector() { return static_cast<int>(move); }
+	
+	//TO DOÇ¢Ç√ÇÍè¡Ç∑
+	bool flg;
+	//Ç±Ç±Ç‹Ç≈
 
 private:
 	int marioImg[10];
-	int x, y;
 	STATE state;
-	int m, n;
+	MOVE_VECTOR move;
+
+	//TO DO Ç¢Ç√ÇÍè¡Ç∑
+	int m;
+	//Ç±Ç±Ç‹Ç≈
 };
 

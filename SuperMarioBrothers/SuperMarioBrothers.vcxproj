@@ -151,6 +151,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BoxCollider.cpp" />
+    <ClCompile Include="CharaBase.cpp" />
     <ClCompile Include="GameMain.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mario.cpp" />
@@ -159,6 +161,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractScene.h" />
+    <ClInclude Include="BoxCollider.h" />
+    <ClInclude Include="CharaBase.h" />
     <ClInclude Include="GameMain.h" />
     <ClInclude Include="Mario.h" />
     <ClInclude Include="PadInput.h" />

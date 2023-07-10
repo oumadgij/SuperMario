@@ -21,6 +21,6 @@ private:
 	int Stage[15][20];
 	int BlockImg[3];
 
-	Mario mario;
+	Mario* mario;
 };
 
