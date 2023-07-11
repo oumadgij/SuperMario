@@ -1,0 +1,7 @@
+#pragma once
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
+
+#define STAGE_WIDTH_BLOCK 20
+#define STAGE_HEIGHT_BLOCK 15
+#define BLOCK_SIZE 32

@@ -1,11 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "DxLib.h"
 #include "GameMain.h"
-#define STAGE_WIDTH_BLOCK 20
-#define STAGE_HEIGHT_BLOCK 15
-#define BLOCK_SIZE 32
-
-#include "PadInput.h"
+#include "Define.h"
 
 GameMain::GameMain()
 {
@@ -48,34 +44,13 @@ AbstractScene* GameMain::Update()
 	mario->Update();
 
 	//マリオとステージブロックの当たり判定
-	int h = mario->GetLocation().y;
-
-	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_LEFT)
-		|| PadInput::GetThumbLX() < -MARGIN)
+	if (mario->ChackHitStage(Stage))
 	{
-		//左に移動
-		DrawString(0, 0, "PRESSED LEFT\n", 0xffffff);
+		mario->flg = true;
 	}
-	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_RIGHT)
-		|| MARGIN < PadInput::GetThumbLX())
+	else
 	{
-		//右に移動
-		DrawString(0, 0, "PRESSED RIGHT\n", 0xffffff);
-	}
-	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_DOWN) || PadInput::GetThumbLY() < -MARGIN)
-	{
-		//しゃがみ
-		DrawString(0, 0, "PRESSED DOWN\n", 0xffffff);
-	}
-	if (PadInput::OnPressed(XINPUT_BUTTON_A))
-	{
-		//ダッシュ
-		DrawString(0, 0, "PRESSED A\n", 0xffffff);
-	}
-	if (PadInput::OnPressed(XINPUT_BUTTON_B))
-	{
-		//ジャンプ
-		DrawString(0, 0, "PRESSED B\n", 0xffffff);
+		mario->flg = false;
 	}
 
 	//for (int h = 0; h < STAGE_HEIGHT_BLOCK; h++)

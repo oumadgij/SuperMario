@@ -1,6 +1,7 @@
 #include "Mario.h"
 #include "DxLib.h"
 #include "PadInput.h"
+#include "Define.h"
 
 #define BIGMARIO_WIDTH_SIZE 32
 #define BIGMARIO_HEIGTH_SIZE 64
@@ -11,8 +12,8 @@ Mario::Mario()
 	m = 0;
 	flg = false;
 	//ここまで
-	Location.x = 6 * BIGMARIO_WIDTH_SIZE;
-	Location.y = 10 * 32 + 32;   //BIGMARIO_HEIGTH_SIZE
+	Location.x = 6 * 32;
+	Location.y = 11 * 32;
 	Speed = 2.5f;
 	XSize = BIGMARIO_WIDTH_SIZE;
 	YSize = BIGMARIO_HEIGTH_SIZE;
@@ -29,9 +30,13 @@ void Mario::Update()
 	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_LEFT)
 		|| PadInput::GetThumbLX() < -MARGIN)
 	{
-		//左に移動
-		Location.x -= Speed;
-		move = MOVE_VECTOR::LEFT;
+		//画面から出ないようにする
+		if (0 < Location.x-Speed)
+		{
+			//左に移動
+			Location.x -= Speed;
+			move = MOVE_VECTOR::LEFT;
+		}
 	}
 	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_RIGHT)
 		|| MARGIN < PadInput::GetThumbLX())
@@ -78,8 +83,10 @@ void Mario::Draw() const
 
 #define DEBUG
 #ifdef DEBUG
-	DrawFormatString(10, 50, 0xffffff, "X %f Y %f", Location.x, Location.y);
-	DrawFormatString(10, 100, 0xffffff, "1：左 2：右 3：上 4：下\nHit %d", static_cast<int>(move));
+	DrawFormatString(10, 10, 0xffffff, "左上のステージ位置\nX %d Y %d", static_cast<int>(Location.x / BLOCK_SIZE), static_cast<int>(Location.y / BLOCK_SIZE));
+	DrawFormatString(10, 50, 0xffffff, "右下のステージ位置\nX %d Y %d", static_cast<int>((Location.x + XSize) / BLOCK_SIZE), static_cast<int>((Location.y + YSize) / BLOCK_SIZE));
+	DrawFormatString(400, 10, 0xffffff, "X %f Y %f", Location.x, Location.y);
+	DrawFormatString(10, 100, 0xffffff, "1：左 2：右 3：上 4：下\n動く方向 %d", static_cast<int>(move));
 	if (flg)
 	{
 		DrawBox(Location.x, Location.y, Location.x + XSize, Location.y + YSize, 0xff0000, FALSE);
@@ -88,7 +95,6 @@ void Mario::Draw() const
 	{
 		DrawBox(Location.x, Location.y, Location.x + XSize, Location.y + YSize, 0x0000ff, FALSE);
 	}
-	DrawPixel(Location.x + XSize, Location.y + YSize, 0xffffff);
 #endif // !DEBUG
 }
 

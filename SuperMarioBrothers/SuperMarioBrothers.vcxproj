@@ -163,6 +163,7 @@
     <ClInclude Include="AbstractScene.h" />
     <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="CharaBase.h" />
+    <ClInclude Include="Define.h" />
     <ClInclude Include="GameMain.h" />
     <ClInclude Include="Mario.h" />
     <ClInclude Include="PadInput.h" />

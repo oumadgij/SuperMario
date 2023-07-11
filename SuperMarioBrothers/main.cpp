@@ -1,9 +1,7 @@
 #include "DxLib.h"
 #include "GameMain.h"
 #include "PadInput.h"
-
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
+#include "Define.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine, int nCmdShow)
