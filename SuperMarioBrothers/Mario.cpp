@@ -2,8 +2,8 @@
 #include "DxLib.h"
 #include "PadInput.h"
 
-#define BIGMARIO_WIDTH 32
-#define BIGMARIO_HEIGTH 64
+#define BIGMARIO_WIDTH_SIZE 32
+#define BIGMARIO_HEIGTH_SIZE 64
 
 Mario::Mario()
 {
@@ -11,11 +11,11 @@ Mario::Mario()
 	m = 0;
 	flg = false;
 	//ここまで
-	Location.x = 6 * 32;
-	Location.y = 10 * 32 + 32;
+	Location.x = 6 * BIGMARIO_WIDTH_SIZE;
+	Location.y = 10 * 32 + 32;   //BIGMARIO_HEIGTH_SIZE
 	Speed = 2.5f;
-	XSize = BIGMARIO_WIDTH;
-	YSize = BIGMARIO_HEIGTH;
+	XSize = BIGMARIO_WIDTH_SIZE;
+	YSize = BIGMARIO_HEIGTH_SIZE;
 	state = STATE::BIG;
 	move = MOVE_VECTOR::STOP;
 	LoadDivGraph("1-1image/Mario/dekamario.png", 10, 10, 1, 32, 64, marioImg);
@@ -74,12 +74,12 @@ void Mario::Update()
 
 void Mario::Draw() const
 {
-	DrawGraph(static_cast<int>(Location.x),static_cast<int>(Location.y), marioImg[m], TRUE);
+	DrawGraph(static_cast<int>(Location.x), static_cast<int>(Location.y), marioImg[m], TRUE);
 
 #define DEBUG
 #ifdef DEBUG
 	DrawFormatString(10, 50, 0xffffff, "X %f Y %f", Location.x, Location.y);
-	DrawFormatString(10, 100, 0xffffff, "1：左 2：右 3：上 4：下\nHit %d", HitVector);
+	DrawFormatString(10, 100, 0xffffff, "1：左 2：右 3：上 4：下\nHit %d", static_cast<int>(move));
 	if (flg)
 	{
 		DrawBox(Location.x, Location.y, Location.x + XSize, Location.y + YSize, 0xff0000, FALSE);
@@ -98,15 +98,15 @@ void Mario::Hit(int stagex, int stagey)
 
 	if (stagex != 0)
 	{
-		switch (HitVector)
+		switch (move)  //何処方向に進んでいたか
 		{
-		case 1:  //左
+		case MOVE_VECTOR::LEFT:  //左
 			//X= (stagex+1) * 32;
-			Location.x = (stagex + 1) * 32;
+			Location.x = static_cast<float>((stagex + 1) * 32);
 			break;
-		case 2:  //右
+		case MOVE_VECTOR::RIGHT:  //右
 			//X = (stagex-1) * 32 + 32;
-			Location.x = (stagex - 1) * 32 + 32;
+			Location.x = static_cast<float>((stagex - 1) * 32 + 32);
 			break;
 		}
 
@@ -115,15 +115,15 @@ void Mario::Hit(int stagex, int stagey)
 	float Y = 0.f;
 	if (stagey != 0)
 	{
-		switch (HitVector)
+		switch (move)
 		{
-		case 3:
+		case MOVE_VECTOR::JUMP:
 			//Y = (stagey+1) * 32 + 32;
-			Location.y = (stagey + 1) * 32 + 32;
+			Location.y = static_cast<float>((stagey + 1) * 32 + 32);
 			break;
-		case 4:
+		case MOVE_VECTOR::DOWN:
 			//Y = (stagey - 1) * 32 + BIGMARIO_HEIGTH;
-			Location.y = (stagey - 1) * 32 + BIGMARIO_HEIGTH;
+			Location.y = static_cast<float>((stagey - 1) * 32 + BIGMARIO_HEIGTH_SIZE);
 			break;
 		}
 

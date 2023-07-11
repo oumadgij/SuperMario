@@ -5,13 +5,15 @@
 #define STAGE_HEIGHT_BLOCK 15
 #define BLOCK_SIZE 32
 
+#include "PadInput.h"
+
 GameMain::GameMain()
 {
 	mario = new Mario;
 
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < STAGE_HEIGHT_BLOCK; i++)
 	{
-		for (int j = 0; j < 20; j++)
+		for (int j = 0; j < STAGE_WIDTH_BLOCK; j++)
 		{
 			Stage[i][j] = -1;
 		}
@@ -29,7 +31,7 @@ GameMain::GameMain()
 
 	while (fgets(buf, sizeof(buf), fp) != NULL)
 	{
-		ret=sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d"
+		ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d"
 			, &Stage[i][0], &Stage[i][1], &Stage[i][2], &Stage[i][3], &Stage[i][4], &Stage[i][5], &Stage[i][6], &Stage[i][7], &Stage[i][8], &Stage[i][9]
 			, &Stage[i][10], &Stage[i][11], &Stage[i][12], &Stage[i][13], &Stage[i][14], &Stage[i][15], &Stage[i][16], &Stage[i][17], &Stage[i][18], &Stage[i][19]);
 		i++;
@@ -46,38 +48,68 @@ AbstractScene* GameMain::Update()
 	mario->Update();
 
 	//マリオとステージブロックの当たり判定
-	for (int h = 0; h < STAGE_HEIGHT_BLOCK; h++)
-	{
-		for (int w = 0; w < STAGE_WIDTH_BLOCK; w++)
-		{
-			if (Stage[h][w] != 0)
-			{
-				if (mario->ChackHitStage(static_cast<float>(w * BLOCK_SIZE), static_cast<float>(h * BLOCK_SIZE), BLOCK_SIZE, BLOCK_SIZE, mario->GetMoveVector()))
-				{
-					mario->flg = true;
+	int h = mario->GetLocation().y;
 
-					/*switch (mario->GetHitVector())
-					{
-					case 1:
-					case 2:
-						mario->Hit(w, 0);
-						break;
-					case 3:
-					case 4:
-						mario->Hit(0, h);
-						break;
-					}*/
-					goto hitcheck_end;
-				}
-				else
-				{
-					mario->flg = false;
-					mario->InitHitVector();
-				}
-			}
-		}
+	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_LEFT)
+		|| PadInput::GetThumbLX() < -MARGIN)
+	{
+		//左に移動
+		DrawString(0, 0, "PRESSED LEFT\n", 0xffffff);
 	}
-	hitcheck_end:
+	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_RIGHT)
+		|| MARGIN < PadInput::GetThumbLX())
+	{
+		//右に移動
+		DrawString(0, 0, "PRESSED RIGHT\n", 0xffffff);
+	}
+	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_DOWN) || PadInput::GetThumbLY() < -MARGIN)
+	{
+		//しゃがみ
+		DrawString(0, 0, "PRESSED DOWN\n", 0xffffff);
+	}
+	if (PadInput::OnPressed(XINPUT_BUTTON_A))
+	{
+		//ダッシュ
+		DrawString(0, 0, "PRESSED A\n", 0xffffff);
+	}
+	if (PadInput::OnPressed(XINPUT_BUTTON_B))
+	{
+		//ジャンプ
+		DrawString(0, 0, "PRESSED B\n", 0xffffff);
+	}
+
+	//for (int h = 0; h < STAGE_HEIGHT_BLOCK; h++)
+	//{
+	//	for (int w = 0; w < STAGE_WIDTH_BLOCK; w++)
+	//	{
+	//		if (Stage[h][w] != 0)
+	//		{
+	//			if (mario->ChackHitStage(static_cast<float>(w * BLOCK_SIZE), static_cast<float>(h * BLOCK_SIZE), BLOCK_SIZE, BLOCK_SIZE, mario->GetMoveVector()))
+	//			{
+	//				mario->flg = true;
+
+	//				switch (mario->GetHitVector())
+	//				{
+	//				case 1:
+	//				case 2:
+	//					mario->Hit(w, 0);
+	//					break;
+	//				case 3:
+	//				case 4:
+	//					mario->Hit(0, h);
+	//					break;
+	//				}
+	//				goto hitcheck_end;
+	//			}
+	//			else
+	//			{
+	//				mario->flg = false;
+	//				mario->InitHitVector();
+	//			}
+	//		}
+	//	}
+	//}
+	//hitcheck_end:
 
 	return this;
 }
