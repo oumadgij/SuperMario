@@ -3,8 +3,9 @@
 #include "PadInput.h"
 #include "Define.h"
 
-#define BIGMARIO_WIDTH_SIZE 32
-#define BIGMARIO_HEIGTH_SIZE 64
+#define SMALL_MARIO_SIZE 32
+#define BIG_MARIO_WIDTH_SIZE 32
+#define BIG_MARIO_HEIGTH_SIZE 64
 
 Mario::Mario()
 {
@@ -15,8 +16,8 @@ Mario::Mario()
 	Location.x = 6 * 32;
 	Location.y = 11 * 32;
 	Speed = 2.5f;
-	XSize = BIGMARIO_WIDTH_SIZE;
-	YSize = BIGMARIO_HEIGTH_SIZE;
+	XSize = BIG_MARIO_WIDTH_SIZE;
+	YSize = BIG_MARIO_HEIGTH_SIZE;
 	state = STATE::BIG;
 	move = MOVE_VECTOR::STOP;
 	LoadDivGraph("1-1image/Mario/dekamario.png", 10, 10, 1, 32, 64, marioImg);
@@ -98,41 +99,6 @@ void Mario::Draw() const
 #endif // !DEBUG
 }
 
-void Mario::Hit(int stagex, int stagey)
+void Mario::Hit()
 {
-	float X = 0.f;
-
-	if (stagex != 0)
-	{
-		switch (move)  //âΩèàï˚å¸Ç…êiÇÒÇ≈Ç¢ÇΩÇ©
-		{
-		case MOVE_VECTOR::LEFT:  //ç∂
-			//X= (stagex+1) * 32;
-			Location.x = static_cast<float>((stagex + 1) * 32);
-			break;
-		case MOVE_VECTOR::RIGHT:  //âE
-			//X = (stagex-1) * 32 + 32;
-			Location.x = static_cast<float>((stagex - 1) * 32 + 32);
-			break;
-		}
-
-		/*Location.x = X;*/
-	}
-	float Y = 0.f;
-	if (stagey != 0)
-	{
-		switch (move)
-		{
-		case MOVE_VECTOR::JUMP:
-			//Y = (stagey+1) * 32 + 32;
-			Location.y = static_cast<float>((stagey + 1) * 32 + 32);
-			break;
-		case MOVE_VECTOR::DOWN:
-			//Y = (stagey - 1) * 32 + BIGMARIO_HEIGTH;
-			Location.y = static_cast<float>((stagey - 1) * 32 + BIGMARIO_HEIGTH_SIZE);
-			break;
-		}
-
-		//Location.y = Y;
-	}
 }

@@ -44,9 +44,10 @@ AbstractScene* GameMain::Update()
 	mario->Update();
 
 	//マリオとステージブロックの当たり判定
-	if (mario->ChackHitStage(Stage))
+	if (mario->ChackHitStage(Stage,mario->GetMoveVector()))
 	{
 		mario->flg = true;
+		mario->HitStage();
 	}
 	else
 	{

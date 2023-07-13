@@ -2,7 +2,7 @@
 #include "Define.h"
 
 //当たり判定をとる(false：当たっていない true：当たっている)
-bool BoxCollider::ChackHitStage(int stage[][20])
+bool BoxCollider::ChackHitStage(int stage[][20], int move_vector)
 {
     /*
     * 自身の判定する範囲を求める
@@ -32,7 +32,7 @@ bool BoxCollider::ChackHitStage(int stage[][20])
         }
         else if (STAGE_WIDTH_BLOCK < vertex[i].x) //ステージより大きいか
         {
-            vertex[i].x = STAGE_WIDTH_BLOCK;
+            vertex[i].x = STAGE_WIDTH_BLOCK - 1;
         }
         //Y座標をチェック
         if (vertex[i].y < 0) //0より小さいか
@@ -41,7 +41,7 @@ bool BoxCollider::ChackHitStage(int stage[][20])
         }
         else if (STAGE_HEIGHT_BLOCK < vertex[i].y) //ステージより大きいか
         {
-            vertex[i].y = STAGE_HEIGHT_BLOCK;
+            vertex[i].y = STAGE_HEIGHT_BLOCK - 1;
         }
     }
 
@@ -54,6 +54,25 @@ bool BoxCollider::ChackHitStage(int stage[][20])
         {
             if (stage[h][w] != 0)
             {
+                switch (move_vector)
+                {
+                case 1:
+                    side = HIT_SIDE::RIGHT;
+                    break;
+                case 2:
+                    side = HIT_SIDE::LEFT;
+                    break;
+                case 3:
+                    side = HIT_SIDE::UNDER;
+                    break;
+                case 4:
+                    side = HIT_SIDE::TOP;
+                    break;
+                }
+
+                HitBlock[0] = h;
+                HitBlock[1] = w;
+
                 return true;  //ブロックに当たっている
             }
         }
@@ -86,73 +105,60 @@ bool BoxCollider::ChackHitStage(int stage[][20])
     return false;
 }
 
-//bool BoxCollider::ChackHitStage(float StageX, float StageY, int XSize, int YSize, int move_vector)
-//{
-//    //自身の右側と下側の座標を求める
-//    VECTOR Locetion2;
-//    Locetion2.x = Location.x + this->XSize;
-//    Locetion2.y = Location.y + this->YSize;
-//
-//    //ステージブロックの右側と下側の座標を求める
-//    int StageX2 = StageX + XSize;
-//    int StageY2 = StageY + YSize;
-//
-//    switch (move_vector)
-//    {
-//    case 1:
-//        //自身の左側がステージブロックの右側よりも大きい
-//        if (StageX2 < Location.x)
-//        {
-//            return false;
-//        }
-//        break;
-//    case 2:
-//        //自身の右側がステージブロックの左側よりも小さい
-//        if (Locetion2.x < StageX)
-//        {
-//            return false;
-//        }
-//        break;
-//    case 3:
-//        //自身の上側がステージブロックの下側よりも大きい
-//        if (StageY2 < Location.y)
-//        {
-//            return false;
-//        }
-//        break;
-//    case 4:
-//        //自身の下側がステージブロックの上側よりも小さい
-//        if (Locetion2.y < StageY)
-//        {
-//            return false;
-//        }
-//        break;
-//    }
-//
-//    ///*中心座標を求める*/
-//    ////自身
-//    //VECTOR Center;
-//    //Center.x = this->Location.x + (this->XSize / 2);
-//    //Center.y = this->Location.y + (this->YSize / 2);
-//    ////対象
-//    //VECTOR OCenter;
-//    //OCenter.x = Location.x + XSize / 2;
-//    //OCenter.y = Location.y + YSize / 2;
-//
-//    ///*X座標間とY座標間の距離を測る*/
-//    //VECTOR Distance;
-//    //Distance.x = fabsf(Center.x - OCenter.x);
-//    //Distance.y = fabsf(Center.y - OCenter.y);
-//
-//    ///*X軸とY軸のサイズの和をとる*/
-//    //int XSize_Sum = (this->XSize + XSize) / 2;
-//    //int YSize_Sum = (this->YSize + YSize) / 2;
-//
-//    ///*比較*/
-//    //if ((Distance.x <= XSize_Sum) && (Distance.y <= YSize_Sum))
-//    //{
-//    //    return true;
-//    //}
-//
-//    return true;
-//}
+void BoxCollider::HitStage()
+{
+    VECTOR vec;
+
+    vec.x = static_cast<float>(HitBlock[1] * BLOCK_SIZE);
+    vec.y = static_cast<float>(HitBlock[0] * BLOCK_SIZE);
+
+    switch (side) //当たったブロックの辺の位置
+    {
+    case HIT_SIDE::LEFT:
+        Location.x = vec.x - BLOCK_SIZE;
+            break;
+    case HIT_SIDE::RIGHT:
+        Location.x = vec.x + BLOCK_SIZE;
+        break;
+    case HIT_SIDE::TOP:
+        Location.y = vec.y - YSize;
+        break;
+    case HIT_SIDE::UNDER:
+        Location.y = vec.y + BLOCK_SIZE;
+        break;
+    }
+
+    //if (stagex != 0)
+    //{
+    //    switch (move)  //何処方向に進んでいたか
+    //    {
+    //    case MOVE_VECTOR::LEFT:  //左
+    //        //X= (stagex+1) * 32;
+    //        Location.x = static_cast<float>((stagex + 1) * 32);
+    //        break;
+    //    case MOVE_VECTOR::RIGHT:  //右
+    //        //X = (stagex-1) * 32 + 32;
+    //        Location.x = static_cast<float>((stagex - 1) * 32 + 32);
+    //        break;
+    //    }
+
+    //    /*Location.x = X;*/
+    //}
+    //float Y = 0.f;
+    //if (stagey != 0)
+    //{
+    //    switch (move)
+    //    {
+    //    case MOVE_VECTOR::JUMP:
+    //        //Y = (stagey+1) * 32 + 32;
+    //        Location.y = static_cast<float>((stagey + 1) * 32 + 32);
+    //        break;
+    //    case MOVE_VECTOR::DOWN:
+    //        //Y = (stagey - 1) * 32 + BIGMARIO_HEIGTH;
+    //        Location.y = static_cast<float>((stagey - 1) * 32 + BIGMARIO_HEIGTH_SIZE);
+    //        break;
+    //    }
+
+    //    //Location.y = Y;
+    //}
+}
