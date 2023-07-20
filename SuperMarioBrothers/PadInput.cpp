@@ -10,9 +10,14 @@ int PadInput::OldY = -1;
 int PadInput::FlgX = 0;
 int PadInput::FlgY = 0;
 
+//to do
+int PadInput::oldKey;
+int PadInput::nowKey;
+//‚±‚±‚Ü‚Å
+
 void PadInput::UpdateKey()
 {
-	GetJoypadXInputState(DX_INPUT_PAD1, &Input);
+	/*GetJoypadXInputState(DX_INPUT_PAD1, &Input);
 	for (int i = 0; i < BUTTONS; i++)
 	{
 		OldKey[i] = NowKey[i];
@@ -20,7 +25,10 @@ void PadInput::UpdateKey()
 	}
 
 	InputX = Input.ThumbLX;
-	InputY = Input.ThumbLY;
+	InputY = Input.ThumbLY;*/
+
+	oldKey = nowKey;
+	nowKey = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 }
 
 void PadInput::SticControl()

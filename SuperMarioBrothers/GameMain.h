@@ -9,7 +9,11 @@ public:
 	GameMain();
 
 	//デストラクタ
-	~GameMain() {};
+	~GameMain()
+	{
+		//delete Stage;
+		//delete BlockImg;
+	}
 
 	//描画以外の更新を実装
 	virtual AbstractScene* Update() override;

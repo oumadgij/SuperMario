@@ -109,8 +109,8 @@ void BoxCollider::HitStage()
 {
     VECTOR vec;
 
-    vec.x = static_cast<float>(HitBlock[1] * BLOCK_SIZE);
     vec.y = static_cast<float>(HitBlock[0] * BLOCK_SIZE);
+    vec.x = static_cast<float>(HitBlock[1] * BLOCK_SIZE);
 
     switch (side) //当たったブロックの辺の位置
     {
