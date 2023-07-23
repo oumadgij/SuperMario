@@ -13,7 +13,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	SceneManager SceneMng(new GameMain());
 
-	while ((SceneMng.Update() != nullptr)&&(ProcessMessage() == 0)&&(PadInput::OnClick(PAD_INPUT_9/*XINPUT_BUTTON_BACK*/) == 0))
+	while ((SceneMng.Update() != nullptr)&&(ProcessMessage() == 0)&&(PadInput::OnClick(XINPUT_BUTTON_BACK) == 0))
 	{
 		ClearDrawScreen();
 

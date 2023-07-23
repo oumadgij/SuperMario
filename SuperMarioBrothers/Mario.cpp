@@ -7,6 +7,8 @@
 #define SMALL_MARIO_SIZE 32
 #define BIG_MARIO_WIDTH_SIZE 32
 #define BIG_MARIO_HEIGTH_SIZE 64
+#define WALK_MAXSPEED 3.2f
+#define DASH_MAXSPEED 4.8f
 
 Mario::Mario()
 {
@@ -33,12 +35,10 @@ Mario::Mario()
 void Mario::Update()
 {
 	m = 0;
-	Move = MOVE_VECTOR::STOP;
-	
+
 	/*移動方向を決める*/
 	//ダッシュ
-	/*if (PadInput::OnPressed(XINPUT_BUTTON_A))*/
-	if(PadInput::OnPressed(PAD_INPUT_1))
+	if (PadInput::OnPressed(XINPUT_BUTTON_A))
 	{
 		mState = MOVE_STATE::DASH;
 	}
@@ -47,29 +47,28 @@ void Mario::Update()
 		mState = MOVE_STATE::WALK;
 	}
 	//左移動
-	/*if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_LEFT)
-		|| PadInput::GetThumbLX() < -MARGIN)*/
-	if(PadInput::OnPressed(PAD_INPUT_LEFT))
+	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_LEFT)
+		|| PadInput::GetThumbLX() < -MARGIN)
 	{
 		Move = MOVE_VECTOR::LEFT;
+		Speed -= Inertia;
 	}
 	//右移動
-	/*if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_RIGHT)
-		|| MARGIN < PadInput::GetThumbLX())*/
-	if(PadInput::OnPressed(PAD_INPUT_RIGHT))
+	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_RIGHT)
+		|| MARGIN < PadInput::GetThumbLX())
 	{
 		Move = MOVE_VECTOR::RIGHT;
+		Speed += Inertia;
 	}
 	//ジャンプ
-	if ((Jumping == false) &&  PadInput::OnPressed(PAD_INPUT_UP))//XINPUT_BUTTON_B
+	if ((Jumping == false) &&  PadInput::OnPressed(XINPUT_BUTTON_B))//PAD_INPUT_UP
 	{
-		Move = MOVE_VECTOR::JUMP;
 		Jumping = true;
 		PreparingJump();
 	}
-	if (PadInput::OnRelese(PAD_INPUT_UP))//XINPUT_BUTTON_B
+	if (PadInput::OnRelese(XINPUT_BUTTON_B))//PAD_INPUT_UP
 	{
-		Move = MOVE_VECTOR::STOP;
+		Move = MOVE_VECTOR::DOWN;
 		kasokudo = -0.437;
 		InitialSpeed = 4;
 
@@ -81,13 +80,18 @@ void Mario::Update()
 		m = 1;
 	}
 
-	/*スピードを変化させる*/
+	/*スピードを制限する*/
 	SpeedUp();
 
 	/*入力を止めた時に少し進んで止まる*/
-	if (Move != MOVE_VECTOR::LEFT&&Move!=MOVE_VECTOR::RIGHT)
+	if (PadInput::OnRelese(XINPUT_BUTTON_DPAD_LEFT)
+		|| -MARGIN < PadInput::GetThumbLX())
 	{
-		SpeedReduction();
+		if (PadInput::OnRelese(XINPUT_BUTTON_DPAD_RIGHT)
+			|| PadInput::GetThumbLX() < MARGIN)
+		{
+			SpeedReduction();
+		}
 	}
 
 	/*ジャンプする*/
@@ -97,6 +101,11 @@ void Mario::Update()
 	}
 
 	/*移動する*/
+	if (Move == MOVE_VECTOR::STOP)  //動いていない、画面に
+	{
+		Speed = 0;
+	}
+
 	Location.x += Speed;
 
 	if (Location.x < 0) //画面から出ないようにする
@@ -130,6 +139,7 @@ void Mario::Draw() const
 	DrawFormatString(10, 50, 0xffffff, "右下のステージ位置\nX %d Y %d", static_cast<int>((Location.x + XSize) / BLOCK_SIZE), static_cast<int>((Location.y + YSize) / BLOCK_SIZE));
 	DrawFormatString(400, 10, 0xffffff, "X %f Y %f", Location.x, Location.y);
 	DrawFormatString(10, 100, 0xffffff, "1：左 2：右 3：上 4：下\n動く方向 %d", static_cast<int>(Move));
+	DrawFormatString(10, 140, 0xffffff, "1：左 2：右 3：上 4：下\n当たった方向 %d", static_cast<int>(side));
 
 	if (flg)
 	{
@@ -146,21 +156,35 @@ void Mario::Hit()
 {
 }
 
+void Mario::HitStage()
+{
+	VECTOR vec;
+
+	vec.y = static_cast<float>(HitBlock[0] * BLOCK_SIZE);
+	vec.x = static_cast<float>(HitBlock[1] * BLOCK_SIZE);
+
+	switch (side) //当たったブロックの辺の位置
+	{
+	case HIT_SIDE::LEFT:
+		Location.x = vec.x - BLOCK_SIZE;
+		break;
+	case HIT_SIDE::RIGHT:
+		Location.x = vec.x + BLOCK_SIZE;
+		break;
+	case HIT_SIDE::TOP:
+		Location.y = vec.y - YSize;
+		break;
+	case HIT_SIDE::UNDER:
+		Location.y = vec.y + BLOCK_SIZE;
+		break;
+	}
+
+	Move = MOVE_VECTOR::STOP;
+}
+
+//スピードを上げる
 void Mario::SpeedUp()
 {
-	const float WALK_MAXSPEED = 3.2f;
-	const float DASH_MAXSPEED = 4.8f;
-
-	//移動方向によってスピードを変化させる
-	if (Move == MOVE_VECTOR::LEFT)
-	{
-		Speed -= Inertia;
-	}
-	else if (Move == MOVE_VECTOR::RIGHT)
-	{
-		Speed += Inertia;
-	}
-
 	//スピードの制限を掛ける
 	if (mState == MOVE_STATE::WALK)
 	{
@@ -186,6 +210,7 @@ void Mario::SpeedUp()
 	}
 }
 
+//スピードを下げる
 void Mario::SpeedReduction()
 {
 	if (mState == MOVE_STATE::WALK)
@@ -201,6 +226,7 @@ void Mario::SpeedReduction()
 		else
 		{
 			Speed = 0.0f;
+			mState = MOVE_STATE::STOP;
 		}
 	}
 	if (mState == MOVE_STATE::DASH)
@@ -216,18 +242,22 @@ void Mario::SpeedReduction()
 		else
 		{
 			Speed = 0.0f;
+			mState = MOVE_STATE::STOP;
 		}
 	}
 }
 
+//ジャンプする前の準備
 void Mario::PreparingJump()
 {
 	kasokudo = 0.125f;
 	InitialSpeed = -4.0f;
 	index = 0;
 	time = 0;
+	Move = MOVE_VECTOR::JUMP;
 }
 
+//ジャンプする
 void Mario::Jump()
 {
 	//初速を代入する
@@ -259,7 +289,7 @@ void Mario::Jump()
 	//Y座標
 	Location.y += InitialSpeed * time + 0.5 * kasokudo * pow(time, 2);
 	//X座標
-	Location.x += 0.5 * Inertia * pow(time, 2) + Speed * time;
+	//Location.x += 0.5 * Inertia * pow(time, 2) + Speed * time;
 
 	//下降するタイミングを判断
 	if (Location.y < 150)//MAX_SMALL_JUMP

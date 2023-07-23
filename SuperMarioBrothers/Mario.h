@@ -11,6 +11,7 @@ enum class STATE
 
 enum class MOVE_STATE
 {
+	STOP,
 	WALK,
 	DASH
 };
@@ -27,7 +28,9 @@ public:
 	void Update();
 	void Draw()const;
 	virtual void Hit()override;
+	void HitStage();  //”»’èŒã‚Ìˆ—
 	int GetMoveVector() { return static_cast<int>(Move); }
+
 
 	//TO DO‚¢‚Ã‚êÁ‚·
 	bool flg;

@@ -46,46 +46,13 @@ AbstractScene* GameMain::Update()
 	//マリオとステージブロックの当たり判定
 	if (mario->ChackHitStage(Stage,mario->GetMoveVector()))
 	{
-		mario->flg = true;
 		mario->HitStage();
+		mario->flg = true;
 	}
 	else
 	{
 		mario->flg = false;
 	}
-
-	//for (int h = 0; h < STAGE_HEIGHT_BLOCK; h++)
-	//{
-	//	for (int w = 0; w < STAGE_WIDTH_BLOCK; w++)
-	//	{
-	//		if (Stage[h][w] != 0)
-	//		{
-	//			if (mario->ChackHitStage(static_cast<float>(w * BLOCK_SIZE), static_cast<float>(h * BLOCK_SIZE), BLOCK_SIZE, BLOCK_SIZE, mario->GetMoveVector()))
-	//			{
-	//				mario->flg = true;
-
-	//				switch (mario->GetHitVector())
-	//				{
-	//				case 1:
-	//				case 2:
-	//					mario->Hit(w, 0);
-	//					break;
-	//				case 3:
-	//				case 4:
-	//					mario->Hit(0, h);
-	//					break;
-	//				}
-	//				goto hitcheck_end;
-	//			}
-	//			else
-	//			{
-	//				mario->flg = false;
-	//				mario->InitHitVector();
-	//			}
-	//		}
-	//	}
-	//}
-	//hitcheck_end:
 
 	return this;
 }
