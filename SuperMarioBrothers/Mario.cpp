@@ -165,21 +165,26 @@ void Mario::HitStage()
 
 	switch (side) //当たったブロックの辺の位置
 	{
-	case HIT_SIDE::LEFT:
+	case HIT_SIDE::LEFT:  //左側
 		Location.x = vec.x - BLOCK_SIZE;
 		break;
-	case HIT_SIDE::RIGHT:
+	case HIT_SIDE::RIGHT: //右側
 		Location.x = vec.x + BLOCK_SIZE;
 		break;
-	case HIT_SIDE::TOP:
+	case HIT_SIDE::TOP:   //上側
 		Location.y = vec.y - YSize;
 		break;
-	case HIT_SIDE::UNDER:
+	case HIT_SIDE::UNDER: //下側
 		Location.y = vec.y + BLOCK_SIZE;
+		//降下準備
+		Move = MOVE_VECTOR::DOWN;
+		kasokudo = -0.437;
+		InitialSpeed = 4;
 		break;
 	}
 
 	Move = MOVE_VECTOR::STOP;
+	flg = false;
 }
 
 //スピードを上げる
@@ -253,7 +258,7 @@ void Mario::PreparingJump()
 	kasokudo = 0.125f;
 	InitialSpeed = -4.0f;
 	index = 0;
-	time = 0;
+	time = 0.016f;
 	Move = MOVE_VECTOR::JUMP;
 }
 
