@@ -54,7 +54,7 @@ bool BoxCollider::ChackHitStage(int stage[][20], int move_vector)
     {
         for (int w = static_cast<int>(vertex[start].x); w <= vertex[end].x; w++)
         {
-            if (stage[h][w] != 0)
+            if (stage[h][w] != 0)  //ƒuƒƒbƒN‚ª“–‚½‚Á‚½Žž
             {
                 switch (move_vector)
                 {

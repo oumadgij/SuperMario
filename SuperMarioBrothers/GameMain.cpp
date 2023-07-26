@@ -19,7 +19,7 @@ GameMain::GameMain()
 	char buf[41];
 	int i = 0, ret;
 
-	fopen_s(&fp, "StageData/仮ステージ1.txt", "r");
+	fopen_s(&fp, "StageData/仮ステージ2.txt", "r");
 	if (fp == NULL)
 	{
 		throw "LoadFile Error";
