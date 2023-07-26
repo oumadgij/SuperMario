@@ -12,15 +12,15 @@ bool BoxCollider::ChackHitStage(int stage[][20], int move_vector)
     VECTOR vertex[2];
     //開始位置(左上)
      //X座標
-    vertex[0].x = Location.x / BLOCK_SIZE;
+    vertex[0].x = (Location.x-XSize/2) / BLOCK_SIZE;
      //Y座標
-    vertex[0].y = Location.y / BLOCK_SIZE;
+    vertex[0].y = (Location.y-YSize/2) / BLOCK_SIZE;
 
     //終了位置(右下)
      //X座標
-    vertex[1].x = ((Location.x + (XSize - 1)) / BLOCK_SIZE);
+    vertex[1].x = ((Location.x + (XSize/2 - 1)) / BLOCK_SIZE);
      //Y座標
-    vertex[1].y = (Location.y + (YSize - 1)) / BLOCK_SIZE;
+    vertex[1].y = (Location.y + (YSize/2 - 1)) / BLOCK_SIZE;
 
     /*自身がステージの範囲を超えていないかチェック*/
     for (int i = 0; i < 2; i++)

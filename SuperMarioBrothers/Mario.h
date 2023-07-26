@@ -58,8 +58,8 @@ private:
 	MOVE_VECTOR Move;    //動く方向
 	MOVE_STATE mState;   //動くときの状態(歩くか走るか)
 
+	/*ジャンプの変数*/
 	JUMP_STATE jState = JUMP_STATE::DEFAULT;
-
 	float MaxJump = 0.0f;
 	float kasokudo = 0.125f;    //加速度
 	float Fallkasokudo = 0.0f;  //落下加速度
@@ -72,9 +72,13 @@ private:
 	float XSpeed = 0.0f;  //x軸の速度
 	float IncrementalAcceleration = 0.0f;  //加速度の増加値
 	int sec = 0;
+	/*アニメーションの変数*/
+	int AnimSpeed = 10;  //画像切り替えスピード
+	int AnimWait;
+	int aIndex = 0;      //画像の添え字
+	bool Turn = false;   //反転するかどうか
 
 	//TO DO いづれ消す
-	int m;
 	int mari = 0;
 	//ここまで
 };

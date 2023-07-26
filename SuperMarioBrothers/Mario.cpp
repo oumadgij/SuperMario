@@ -13,18 +13,19 @@
 Mario::Mario()
 {
 	//TO DO いつか消す
-	m = 0;
 	flg = false;
 	Jumping = true;
 	//ここまで
-	Location.x = 6 * BLOCK_SIZE;
-	Location.y = 12 * BLOCK_SIZE;
-	//Location.y = 11 * BLOCK_SIZE;
-	Speed = 0.0f;
-	Inertia = 0.2f;
 	XSize = SMALL_MARIO_SIZE;
 	YSize = SMALL_MARIO_SIZE;
-	State = STATE::SMALL;
+	Location.x = 6 * BLOCK_SIZE+XSize/2;
+	//Location.y = 12 * BLOCK_SIZE+BLOCK_SIZE/2;
+	Location.y = 12 * BLOCK_SIZE+YSize/2;
+	Speed = 0.0f;
+	Inertia = 0.2f;
+	AnimWait = 0;
+	//State = STATE::SMALL;
+	State = STATE::BIG;
 	Move = MOVE_VECTOR::STOP;
 	mState = MOVE_STATE::WALK;
 	LoadDivGraph("1-1image/Mario/dekamario.png", 10, 10, 1, 32, 64, b_marioImg);
@@ -33,8 +34,6 @@ Mario::Mario()
 
 void Mario::Update()
 {
-	m = 0;
-
 	/*移動方向を決める*/
 	//ダッシュ
 	if (PadInput::OnPressed(XINPUT_BUTTON_A))
@@ -51,6 +50,7 @@ void Mario::Update()
 	{
 		Move = MOVE_VECTOR::LEFT;
 		Speed -= Inertia;
+		Turn = true;
 	}
 	//右移動
 	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_RIGHT)
@@ -58,6 +58,7 @@ void Mario::Update()
 	{
 		Move = MOVE_VECTOR::RIGHT;
 		Speed += Inertia;
+		Turn = false;
 	}
 	//ジャンプ
 	if (Jumping && PadInput::OnClick(XINPUT_BUTTON_B))
@@ -74,12 +75,15 @@ void Mario::Update()
 		Move = MOVE_VECTOR::DOWN;
 		kasokudo += Fallkasokudo;
 	}
-
+	
 	//しゃがみ
-	if ((State == STATE::BIG || State == STATE::FIRE)
-		&& (PadInput::OnPressed(XINPUT_BUTTON_DPAD_DOWN) || PadInput::GetThumbLY() < -MARGIN))
+	if (PadInput::OnPressed(XINPUT_BUTTON_DPAD_DOWN) 
+		|| PadInput::GetThumbLY() < -MARGIN)
 	{
-		m = 1;
+		if (State == STATE::BIG || State == STATE::FIRE)
+		{
+			aIndex = 1;
+		}
 	}
 
 	/*スピードを制限する*/
@@ -115,6 +119,9 @@ void Mario::Update()
 		Location.x = 0;
 	}
 
+	/*アニメーション*/
+	Animation();
+
 #define DEBUG
 #ifndef DEBUG
 	if (PadInput::OnClick(XINPUT_BUTTON_LEFT_SHOULDER))
@@ -140,15 +147,13 @@ void Mario::Update()
 
 void Mario::Draw() const
 {
-	//DrawGraph(static_cast<int>(Location.x), static_cast<int>(Location.y), s_marioImg[m], TRUE);
-
 	if (State == STATE::SMALL)
 	{
-		DrawGraph(static_cast<int>(Location.x), static_cast<int>(Location.y), s_marioImg[m], TRUE);
+		DrawRotaGraphF(Location.x, Location.y, 1, 0, s_marioImg[aIndex],TRUE, Turn);
 	}
 	else
 	{
-		DrawGraph(static_cast<int>(Location.x), static_cast<int>(Location.y), b_marioImg[m], TRUE);
+		DrawRotaGraphF(Location.x, Location.y, 1, 0, b_marioImg[aIndex], TRUE, Turn);
 	}
 
 #define DEBUG
@@ -157,17 +162,18 @@ void Mario::Draw() const
 	DrawFormatString(10, 50, 0xffffff, "右下のステージ位置\nX %d Y %d", static_cast<int>((Location.x + XSize) / BLOCK_SIZE), static_cast<int>((Location.y + YSize) / BLOCK_SIZE));
 	DrawFormatString(400, 10, 0xffffff, "X %f Y %f", Location.x, Location.y);
 	DrawFormatString(10, 100, 0xffffff, "1：左 2：右 3：上 4：下\n動く方向 %d", static_cast<int>(Move));
-	DrawFormatString(10, 140, 0xffffff, "1：左 2：右 3：上 4：下\n当たった方向 %d", static_cast<int>(side));
-	//DrawFormatString(10, 180, 0xffffff, "マリオの状態 %d", static_cast<int>(State));
+	//DrawFormatString(10, 140, 0xffffff, "1：左 2：右 3：上 4：下\n当たった方向 %d", static_cast<int>(side));
+	DrawFormatString(10, 140, 0xffffff, "0:default 1：ground 2：sky\njstate %d", static_cast<int>(jState));
+	DrawFormatString(10, 180, 0xffffff, "0:Stop 1:Walk 2:Dash\n mState %d", static_cast<int>(mState));
 	DrawFormatString(300, 30, 0xffffff, "kasoku %f speed %f \nYspeed %f Acceleration %f", kasokudo, Speed, YSpeed,IncrementalAccelerationData[index]);
 
 	if (flg)
 	{
-		DrawBox(Location.x, Location.y, Location.x + XSize, Location.y + YSize, 0xff0000, FALSE);
+		DrawBox(Location.x-XSize/2, Location.y-YSize/2, Location.x + XSize/2, Location.y + YSize/2, 0xff0000, FALSE);
 	}
 	else
 	{
-		DrawBox(Location.x, Location.y, Location.x + XSize, Location.y + YSize, 0x0000ff, FALSE);
+		DrawBox(Location.x - XSize / 2, Location.y - XSize / 2, Location.x + XSize / 2, Location.y + YSize / 2, 0x0000ff, FALSE);
 	}
 #endif // !DEBUG
 }
@@ -338,11 +344,11 @@ void Mario::Jump()
 	//地面に着地したか判断
 	if (State == STATE::SMALL)
 	{
-		Ground = 12 * BLOCK_SIZE;
+		Ground = 12 * BLOCK_SIZE+BLOCK_SIZE/2;
 	}
 	else
 	{
-		Ground = 11 * BLOCK_SIZE;
+		Ground = 11 * BLOCK_SIZE+BLOCK_SIZE/2;
 	}
 	
 	if (Ground < Location.y)
@@ -355,5 +361,89 @@ void Mario::Jump()
 
 void Mario::Animation()
 {
-
+	//ジャンプしている時
+	if (jState == JUMP_STATE::SKY)
+	{
+		if (State == STATE::SMALL)
+		{
+			aIndex = 5;
+		}
+		else if (State == STATE::BIG)
+		{
+			aIndex = 6;
+		}
+	}//歩いている時
+	else if (Move != MOVE_VECTOR::STOP)
+	{
+		if (mState == MOVE_STATE::WALK)
+		{
+			if (++AnimWait % AnimSpeed == 0)
+			{
+				if (State == STATE::SMALL)
+				{
+					if (3 < ++aIndex)
+					{
+						aIndex = 1;
+					}
+				}
+				else if (State == STATE::BIG)
+				{
+					if (4 < ++aIndex)
+					{
+						aIndex = 2;
+					}
+				}
+			}
+		}
+		else if (mState == MOVE_STATE::DASH)
+		{
+			if (++AnimWait % (AnimSpeed / 2) == 0)
+			{
+				if (State == STATE::SMALL)
+				{
+					if (3 < ++aIndex)
+					{
+						aIndex = 1;
+					}
+				}
+				else if (State == STATE::BIG)
+				{
+					if (4 < ++aIndex)
+					{
+						aIndex = 2;
+					}
+				}
+			}
+		}
+		//入力方向から反対に入力した時に
+		//マリオが急ブレーキ掛けた体制をとる
+		if (Move == MOVE_VECTOR::RIGHT
+			&& Speed < 0)
+		{
+			if (State == STATE::SMALL)
+			{
+				aIndex = 4;
+			}
+			else if (State == STATE::BIG)
+			{
+				aIndex = 5;
+			}
+		}
+		if (Move == MOVE_VECTOR::LEFT
+			&& 0 < Speed)
+		{
+			if (State == STATE::SMALL)
+			{
+				aIndex = 4;
+			}
+			else if (State == STATE::BIG)
+			{
+				aIndex = 5;
+			}
+		}
+	}
+	else
+	{
+		aIndex = 0;
+	}
 }
