@@ -20,7 +20,7 @@ Mario::Mario()
 	YSize = SMALL_MARIO_SIZE;
 	Location.x = 6 * BLOCK_SIZE+XSize/2;
 	//Location.y = 12 * BLOCK_SIZE+BLOCK_SIZE/2;
-	Location.y = 12 * BLOCK_SIZE+YSize/2;
+	Location.y = 11 * BLOCK_SIZE + BLOCK_SIZE;
 	Speed = 0.0f;
 	Inertia = 0.2f;
 	AnimWait = 0;
@@ -157,7 +157,7 @@ void Mario::Draw() const
 	}
 
 #define DEBUG
-#ifdef DEBUG
+#ifndef DEBUG
 	DrawFormatString(10, 10, 0xffffff, "左上のステージ位置\nX %d Y %d", static_cast<int>(Location.x / BLOCK_SIZE), static_cast<int>(Location.y / BLOCK_SIZE));
 	DrawFormatString(10, 50, 0xffffff, "右下のステージ位置\nX %d Y %d", static_cast<int>((Location.x + XSize) / BLOCK_SIZE), static_cast<int>((Location.y + YSize) / BLOCK_SIZE));
 	DrawFormatString(400, 10, 0xffffff, "X %f Y %f", Location.x, Location.y);
@@ -348,7 +348,7 @@ void Mario::Jump()
 	}
 	else
 	{
-		Ground = 11 * BLOCK_SIZE+BLOCK_SIZE/2;
+		Ground = 12 * BLOCK_SIZE+BLOCK_SIZE;
 	}
 	
 	if (Ground < Location.y)
