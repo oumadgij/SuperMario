@@ -35,7 +35,8 @@ public:
 	void Draw()const;
 	virtual void Hit()override;
 	void HitStage();  //”»’èŒã‚Ìˆ—
-	int GetMoveVector() { return static_cast<int>(Move); }
+	float GetSpeed()const { return Speed; }
+	int GetMoveVector()const { return (int)Move; }
 
 
 	//TO DO‚¢‚Ã‚êÁ‚·

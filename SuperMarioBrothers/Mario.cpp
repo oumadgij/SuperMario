@@ -18,14 +18,14 @@ Mario::Mario()
 	//ここまで
 	XSize = SMALL_MARIO_SIZE;
 	YSize = SMALL_MARIO_SIZE;
-	Location.x = 6 * BLOCK_SIZE+XSize/2;
-	//Location.y = 12 * BLOCK_SIZE+BLOCK_SIZE/2;
-	Location.y = 11 * BLOCK_SIZE + BLOCK_SIZE;
+	Location.x = 2 * BLOCK_SIZE+XSize/2;
+	Location.y = 12 * BLOCK_SIZE+BLOCK_SIZE/2;
+	//Location.y = 11 * BLOCK_SIZE + BLOCK_SIZE;
 	Speed = 0.0f;
 	Inertia = 0.2f;
 	AnimWait = 0;
-	//State = STATE::SMALL;
-	State = STATE::BIG;
+	State = STATE::SMALL;
+	//State = STATE::BIG;
 	Move = MOVE_VECTOR::STOP;
 	mState = MOVE_STATE::WALK;
 	LoadDivGraph("1-1image/Mario/dekamario.png", 10, 10, 1, 32, 64, b_marioImg);
@@ -111,12 +111,14 @@ void Mario::Update()
 	{
 		Speed = 0;
 	}
-
 	Location.x += Speed;
-
 	if (Location.x < 0) //画面から出ないようにする
 	{
 		Location.x = 0;
+	}
+	if (320.0f < Location.x)
+	{
+		Location.x = 320.0f;
 	}
 
 	/*アニメーション*/

@@ -11,6 +11,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	if (DxLib_Init() == -1) return -1;
 	SetDrawScreen(DX_SCREEN_BACK);
 
+	SetDrawArea(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); //•`‰æ”ÍˆÍ‚ğİ’è
+
 	SceneManager SceneMng(new GameMain());
 
 	while ((SceneMng.Update() != nullptr)&&(ProcessMessage() == 0)&&(PadInput::OnClick(XINPUT_BUTTON_BACK) == 0))
