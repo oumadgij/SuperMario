@@ -28,14 +28,9 @@ public:
 	void Scroll(float scroll,int sabun)const;
 
 private:
-	int Stage[15][212];  //ステージデータを入れる変数
-	int BackData[15][49];
-	
-	/* TO DO */
-	float s_ScrollX = 0.0f;
-	float b_ScrollX1 = 0.0f;
-	float b_ScrollX2 = 1568.f;
-	/*ここまで*/
+	int Stage[15][211];  //ステージデータを入れる変数
+	int BackData[15][211];
+	float ScrollX = 0.0f;
 	
 	/*ブロックの画像を入れる変数*/
 	int Floor;            //フロアブロック
@@ -49,10 +44,7 @@ private:
 	int Pipe[4];          //土管
 	
 	/*背景の画像を入れる変数*/
-	int Sky;         //空
-	int Cloud[6];    //雲
-	int Leaf[3];     //葉
-	int Mountain[6]; //山
+	int BackImages[16];
 
 	Mario* mario;
 };

@@ -35,39 +35,10 @@ AbstractScene* GameMain::Update()
 		mario->flg = false;
 	}
 
-	//スクロールするんだけど、なんか硬い
-	//マリオのスピードと同じくらいの速さとぬるぬる感でスクロールさせたい
-
 	//マリオが画面の半分に行ったときにスクロールする
 	if ((320 <= mario->GetLocation().x)&& (0 < mario->GetSpeed()))
 	{
-		s_ScrollX += mario->GetSpeed();
-		b_ScrollX1 -= mario->GetSpeed();
-		//背景の最後のブロックが見える位置まできたら
-		//スクロール2を加算する
-		b_ScrollX2 -= mario->GetSpeed();
-
-		//背景が全て見えなくなるまできたら
-		//スクロール1を0にする
-		int h = BACK_WIDTH * BLOCK_SIZE * -1;
-		if (b_ScrollX1 < h)
-		{
-			b_ScrollX1 = 0;
-		}
-		if (b_ScrollX2 < 0)
-		{
-			b_ScrollX2 = BACK_WIDTH * BLOCK_SIZE;
-		}
-
-		////スクロール量を制限
-		//if (WINDOW_WIDTH < b_ScrollX2)
-		//{
-		//	b_ScrollX1 = 0;
-		//}
-		//if (WINDOW_WIDTH < b_ScrollX1)
-		//{
-		//	b_ScrollX2 = 0;
-		//}
+		ScrollX += mario->GetSpeed();
 	}
 
 	return this;
@@ -75,42 +46,43 @@ AbstractScene* GameMain::Update()
 
 void GameMain::Draw() const
 {
-	Scroll(b_ScrollX1,WINDOW_WIDTH);
-	Scroll(b_ScrollX2, 0);
-
-	//ステージ描画
+	int w = 0;
 	for (int i = 0; i < STAGE_HEIGHT; i++)
 	{	
 		for (int j = 0; j < STAGE_WIDTH; j++)
 		{
+			//背景を描画
+			DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, BackImages[BackData[i][j]], TRUE);
+
+			//ステージを描画
 			switch (Stage[i][j])
 			{
 			case 1:  //フロアブロック
-				DrawGraph(j * BLOCK_SIZE - s_ScrollX, i * BLOCK_SIZE, Floor, TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Floor, TRUE);
 				break;
 			case 2:  //普通のブロック
-				DrawGraph(j * BLOCK_SIZE - s_ScrollX, i * BLOCK_SIZE, Block, TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Block, TRUE);
 				break;
 			case 3:  //ハテナブロック
-				DrawGraph(j * BLOCK_SIZE - s_ScrollX, i * BLOCK_SIZE, QuestionBlock[0], TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, QuestionBlock[0], TRUE);
 				break;
 			case 4:  //空ブロック
-				DrawGraph(j * BLOCK_SIZE - s_ScrollX, i * BLOCK_SIZE, EmptyBlock, TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, EmptyBlock, TRUE);
 				break;
 			case 6:  //階段ブロック
-				DrawGraph(j * BLOCK_SIZE - s_ScrollX, i * BLOCK_SIZE, StairsBlock, TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, StairsBlock, TRUE);
 				break;
 			case 7:  //土管
-				DrawGraph(j * BLOCK_SIZE - s_ScrollX, i * BLOCK_SIZE, Pipe[0], TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Pipe[0], TRUE);
 				break;
-			case 8:
-				DrawGraph(j * BLOCK_SIZE - s_ScrollX, i * BLOCK_SIZE, Pipe[1], TRUE);
+			case 8:	//土管
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Pipe[1], TRUE);
 				break;
-			case 9:
-				DrawGraph(j * BLOCK_SIZE - s_ScrollX, i * BLOCK_SIZE, Pipe[2], TRUE);
+			case 9:	//土管
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Pipe[2], TRUE);
 				break;
-			case 10:
-				DrawGraph(j * BLOCK_SIZE - s_ScrollX, i * BLOCK_SIZE, Pipe[3], TRUE);
+			case 10://土管
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Pipe[3], TRUE);
 				break;
 			}
 		}
@@ -120,9 +92,6 @@ void GameMain::Draw() const
 
 #define DEBUG
 #ifdef DEBUG
-	DrawFormatString(0, 50, 0xff0000, "X1最初 %f　X1最後 %f", 0 * BLOCK_SIZE + b_ScrollX1, 48 * BLOCK_SIZE + b_ScrollX1);
-	DrawFormatString(0, 100, 0xff0000, "X2最初 %f　X2最後 %f", 0 * BLOCK_SIZE + b_ScrollX2, 48 * BLOCK_SIZE + b_ScrollX2);
-	DrawFormatString(0, 150, 0xff0000, "scroll1 %f\nscroll2 %f", b_ScrollX1, b_ScrollX2);
 #endif // DEBUG
 
 }
@@ -208,87 +177,33 @@ int GameMain::LoadImages()
 	if ((Pipe[2] = LoadGraph("1-1image/dokan_left_down.png")) == -1) return -1;
 	if ((Pipe[3] = LoadGraph("1-1image/dokan_right_down.png")) == -1) return -1;
 	if (LoadDivGraph("1-1image/Block/hatena.png", 4, 4, 1, 32, 32, QuestionBlock) == -1) return -1;
-	//背景
-	if ((Sky = LoadGraph("1-1image/sora.png")) == -1) return -1;
-	if ((Cloud[0] = LoadGraph("1-1image/cloud6.png")) == -1) return -1;
-	if ((Cloud[1] = LoadGraph("1-1image/cloud5.png")) == -1) return -1;
-	if ((Cloud[2] = LoadGraph("1-1image/cloud4.png")) == -1) return -1;
-	if ((Cloud[3] = LoadGraph("1-1image/cloud1.png")) == -1) return -1;
-	if ((Cloud[4] = LoadGraph("1-1image/cloud2.png")) == -1) return -1;
-	if ((Cloud[5] = LoadGraph("1-1image/cloud3.png")) == -1) return -1;
-	if ((Leaf[0] = LoadGraph("1-1image/ha0.png")) == -1) return -1;
-	if ((Leaf[1] = LoadGraph("1-1image/ha1.png")) == -1) return -1;
-	if ((Leaf[2] = LoadGraph("1-1image/ha2.png")) == -1) return -1;
-	if ((Mountain[0] = LoadGraph("1-1image/mountain_left.png")) == -1) return -1;
-	if ((Mountain[1] = LoadGraph("1-1image/mountain_right.png")) == -1) return -1;
-	if ((Mountain[2] = LoadGraph("1-1image/mountain_up.png")) == -1) return -1;
-	if ((Mountain[3] = LoadGraph("1-1image/mountain_surface.png")) == -1) return -1;
-	if ((Mountain[4] = LoadGraph("1-1image/mountain_surface1.png")) == -1) return -1;
-	if ((Mountain[5] = LoadGraph("1-1image/mountain_surface2.png")) == -1) return -1;
+	/*背景*/
+	//空
+	if ((BackImages[0] = LoadGraph("1-1image/sora.png")) == -1) return -1;
+	//草
+	if ((BackImages[1] = LoadGraph("1-1image/ha0.png")) == -1) return -1;
+	if ((BackImages[2] = LoadGraph("1-1image/ha1.png")) == -1) return -1;
+	if ((BackImages[3] = LoadGraph("1-1image/ha2.png")) == -1) return -1;
+	//山
+	if ((BackImages[4] = LoadGraph("1-1image/mountain_left.png")) == -1) return -1;
+	if ((BackImages[5] = LoadGraph("1-1image/mountain_right.png")) == -1) return -1;
+	if ((BackImages[6] = LoadGraph("1-1image/mountain_up.png")) == -1) return -1;
+	if ((BackImages[7] = LoadGraph("1-1image/mountain_surface.png")) == -1) return -1;
+	if ((BackImages[8] = LoadGraph("1-1image/mountain_surface1.png")) == -1) return -1;
+	if ((BackImages[9] = LoadGraph("1-1image/mountain_surface2.png")) == -1) return -1;
+	//雲
+	if ((BackImages[10] = LoadGraph("1-1image/cloud6.png")) == -1) return -1;
+	if ((BackImages[11] = LoadGraph("1-1image/cloud5.png")) == -1) return -1;
+	if ((BackImages[12] = LoadGraph("1-1image/cloud4.png")) == -1) return -1;
+	if ((BackImages[13] = LoadGraph("1-1image/cloud1.png")) == -1) return -1;
+	if ((BackImages[14] = LoadGraph("1-1image/cloud2.png")) == -1) return -1;
+	if ((BackImages[15] = LoadGraph("1-1image/cloud3.png")) == -1) return -1;
+	
 
 	return 0;
 }
 
 void GameMain::Scroll(float scroll,int sabun)const
 {
-	int w = 0;
-	for (int i = 0; i < STAGE_HEIGHT_BLOCK; i++)
-	{
-		//背景
-		for (int j = 0; j < BACK_WIDTH; j++)
-		{
-			w = j * BLOCK_SIZE + scroll;
-			switch (BackData[i][j])
-			{
-			case 0:
-				DrawGraph(w, i * BLOCK_SIZE, Sky, TRUE);
-				break;
-			case 1:
-				DrawGraph(w , i * BLOCK_SIZE, Leaf[0], TRUE);
-				break;
-			case 2:
-				DrawGraph(w, i * BLOCK_SIZE, Leaf[1], TRUE);
-				break;
-			case 3:
-				DrawGraph(w, i * BLOCK_SIZE, Leaf[2], TRUE);
-				break;
-			case 4:
-				DrawGraph(w , i * BLOCK_SIZE, Mountain[0], TRUE);
-				break;
-			case 5:
-				DrawGraph(w , i * BLOCK_SIZE, Mountain[1], TRUE);
-				break;
-			case 6:
-				DrawGraph(w , i * BLOCK_SIZE, Mountain[2], TRUE);
-				break;
-			case 7:
-				DrawGraph(w, i * BLOCK_SIZE, Mountain[3], TRUE);
-				break;
-			case 8:
-				DrawGraph(w , i * BLOCK_SIZE, Mountain[4], TRUE);
-				break;
-			case 9:
-				DrawGraph(w , i * BLOCK_SIZE, Mountain[5], TRUE);
-				break;
-			case 10:
-				DrawGraph(w , i * BLOCK_SIZE, Cloud[0], TRUE);
-				break;
-			case 11:
-				DrawGraph(w , i * BLOCK_SIZE, Cloud[1], TRUE);
-				break;
-			case 12:
-				DrawGraph(w , i * BLOCK_SIZE, Cloud[2], TRUE);
-				break;
-			case 13:
-				DrawGraph(w , i * BLOCK_SIZE, Cloud[3], TRUE);
-				break;
-			case 14:
-				DrawGraph(w , i * BLOCK_SIZE, Cloud[4], TRUE);
-				break;
-			case 15:
-				DrawGraph(w , i * BLOCK_SIZE, Cloud[5], TRUE);
-				break;
-			}
-		}
-	}
+
 }

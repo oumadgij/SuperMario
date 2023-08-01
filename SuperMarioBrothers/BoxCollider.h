@@ -15,7 +15,7 @@ class BoxCollider
 public:
 	//bool ChackHitStage(float StageX, float StageY, int XSize, int YSize, int move_vector);  //当たり判定をとる(false：当たっていない true：当たっている)
 	//ステージ
-	bool ChackHitStage(int stage[][212],int move_vector); //当たり判定
+	bool ChackHitStage(int stage[][211],int move_vector); //当たり判定
 	//void HitStage();  //判定後の処理
 
 	VECTOR GetLocation()const { return Location; }

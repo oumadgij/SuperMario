@@ -2,7 +2,7 @@
 #include "Define.h"
 
 //“–‚½‚è”»’è‚ğ‚Æ‚é(falseF“–‚½‚Á‚Ä‚¢‚È‚¢ trueF“–‚½‚Á‚Ä‚¢‚é)
-bool BoxCollider::ChackHitStage(int stage[][212], int move_vector)
+bool BoxCollider::ChackHitStage(int stage[][211], int move_vector)
 {
     /*
     * ©g‚Ì”»’è‚·‚é”ÍˆÍ‚ğ‹‚ß‚é
