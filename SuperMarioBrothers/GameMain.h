@@ -25,8 +25,6 @@ public:
 	//画像読み込み
 	int LoadImages();
 
-	void Scroll(float scroll,int sabun)const;
-
 private:
 	int Stage[15][211];  //ステージデータを入れる変数
 	int BackData[15][211];

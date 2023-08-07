@@ -7,8 +7,15 @@ enum class MOVE_VECTOR
 	STOP = 0,
 	LEFT,
 	RIGHT,
-	JUMP,
+	UP,
 	DOWN
+};
+
+enum class JUMP_STATE
+{
+	DEFAULT,
+	GROUND,
+	SKY
 };
 
 class CharaBase :public BoxCollider

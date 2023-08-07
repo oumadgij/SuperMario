@@ -22,10 +22,20 @@ GameMain::GameMain()
 
 AbstractScene* GameMain::Update()
 {
+	if (mario->GetJState() != 2 && 
+		(mario->GetMoveVector() < 3 || mario->GetMoveVector() == 4))
+	{
+		if (mario->ChackUnder(Stage, ScrollX))
+		{
+			mario->Fall();
+		}
+	}
+
 	mario->Update();
+	
 
 	//マリオとステージブロックの当たり判定
-	if (mario->ChackHitStage(Stage,mario->GetMoveVector()))
+	if (mario->ChackHitStage(Stage,mario->GetJState(),mario->GetMoveVector(),ScrollX))
 	{
 		mario->HitStage();
 		mario->flg = true;
@@ -46,7 +56,6 @@ AbstractScene* GameMain::Update()
 
 void GameMain::Draw() const
 {
-	int w = 0;
 	for (int i = 0; i < STAGE_HEIGHT; i++)
 	{	
 		for (int j = 0; j < STAGE_WIDTH; j++)
@@ -92,6 +101,10 @@ void GameMain::Draw() const
 
 #define DEBUG
 #ifdef DEBUG
+	//DrawFormatString(10, 10, 0xffffff, "左上のステージ位置\nX %d Y %d", static_cast<int>((mario->GetLocation().x - mario->GetSizeX() / 2) / BLOCK_SIZE + ScrollX / BLOCK_SIZE), static_cast<int>((mario->GetLocation().y - mario->GetSizeY() / 2) / BLOCK_SIZE));
+	DrawFormatString(400, 300, 0x000000, "move_vector %d", mario->GetMoveVector());
+	DrawFormatString(10, 10, 0xffffff, "左下のステージ位置\nX %d Y %d", static_cast<int>((mario->GetLocation().x - mario->GetSizeX() / 2) / BLOCK_SIZE + ScrollX / BLOCK_SIZE), static_cast<int>((mario->GetLocation().y + mario->GetSizeY() / 2) / BLOCK_SIZE));
+	DrawFormatString(10, 50, 0xffffff, "右下のステージ位置\nX %d Y %d", static_cast<int>((mario->GetLocation().x + mario->GetSizeX() / 2 - 1) / BLOCK_SIZE + ScrollX / BLOCK_SIZE), static_cast<int>((mario->GetLocation().y + (mario->GetSizeY() / 2)) / BLOCK_SIZE));
 #endif // DEBUG
 
 }
@@ -201,9 +214,4 @@ int GameMain::LoadImages()
 	
 
 	return 0;
-}
-
-void GameMain::Scroll(float scroll,int sabun)const
-{
-
 }

@@ -15,13 +15,6 @@ enum class MOVE_STATE
 	DASH
 };
 
-enum class JUMP_STATE
-{
-	DEFAULT,
-	GROUND,
-	SKY
-};
-
 class Mario : public CharaBase
 {
 public:
@@ -35,12 +28,16 @@ public:
 	void Draw()const;
 	virtual void Hit()override;
 	void HitStage();  //判定後の処理
+	void Fall();
 	float GetSpeed()const { return Speed; }
 	int GetMoveVector()const { return (int)Move; }
 
 
 	//TO DOいづれ消す
 	bool flg;
+	int GetSizeX()const { return XSize; }
+	int GetSizeY()const { return YSize; }
+	int GetJState()const { return (int)jState; }
 	//ここまで
 
 private:
@@ -54,7 +51,7 @@ private:
 	int s_marioImg[10];
 	int b_marioImg[10];
 	float Inertia;       //慣性
-	bool Jumping;        //ジャンプしてよいか(true：ジャンプしてよい false：ジャンプしない)
+	bool Jumping;        //ジャンプしているか(true：ジャンプしている false：ジャンプしていない)
 	STATE State;         //マリオの状態
 	MOVE_VECTOR Move;    //動く方向
 	MOVE_STATE mState;   //動くときの状態(歩くか走るか)
@@ -66,7 +63,7 @@ private:
 	float Fallkasokudo = 0.0f;  //落下加速度
 	const float IncrementalAccelerationData[5] = { 0.125,0.125,0.117,0.156,0.156 }; //増加加速度
 	const float FallAcceleration[5] = { 0.437,0.473,0.375,0.562,0.562 };  //降下時の加速度
-	const int InitialSpeed[5] = { -4,-4,-4,-5,-5 };  //初速
+	const int InitialSpeed[5] = { -6,-6,-6,-7,-7 };  //初速 元-4,-4,-4,-5,-5
 	const int MaxFallSpeed = 4;  //最大降下速度
 	int index = 0;
 	float YSpeed = 0.0f;  //y軸の速度
