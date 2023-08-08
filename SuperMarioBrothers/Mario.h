@@ -27,7 +27,7 @@ public:
 	void Update();
 	void Draw()const;
 	virtual void Hit()override;
-	void HitStage();  //判定後の処理
+	void HitStage(int h_block,int w_block,int hit_side);  //判定後の処理
 	void Fall();
 	float GetSpeed()const { return Speed; }
 	int GetMoveVector()const { return (int)Move; }
@@ -35,8 +35,6 @@ public:
 
 	//TO DOいづれ消す
 	bool flg;
-	int GetSizeX()const { return XSize; }
-	int GetSizeY()const { return YSize; }
 	int GetJState()const { return (int)jState; }
 	//ここまで
 
@@ -61,8 +59,8 @@ private:
 	float MaxJump = 0.0f;
 	float kasokudo = 0.125f;    //加速度
 	float Fallkasokudo = 0.0f;  //落下加速度
-	const float IncrementalAccelerationData[5] = { 0.125,0.125,0.117,0.156,0.156 }; //増加加速度
-	const float FallAcceleration[5] = { 0.437,0.473,0.375,0.562,0.562 };  //降下時の加速度
+	const float IncrementalAccelerationData[5] = { 0.125f,0.125f,0.117f,0.156f,0.156f }; //増加加速度
+	const float FallAcceleration[5] = { 0.437f,0.473f,0.375f,0.562f,0.562f };  //降下時の加速度
 	const int InitialSpeed[5] = { -6,-6,-6,-7,-7 };  //初速 元-4,-4,-4,-5,-5
 	const int MaxFallSpeed = 4;  //最大降下速度
 	int index = 0;

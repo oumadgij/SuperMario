@@ -26,6 +26,9 @@ public:
 
 	virtual void Hit() = 0; //当たり判定
 	//void HitStage(int stagex, int stagey);  //ステージの当たり判定
+	VECTOR GetLocation()const { return Location; }
+	int GetSizeX()const { return XSize; }
+	int GetSizeY()const { return YSize; }
 
 protected:
 	float Speed;      //歩行スピード

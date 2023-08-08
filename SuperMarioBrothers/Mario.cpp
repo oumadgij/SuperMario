@@ -175,8 +175,6 @@ void Mario::Draw() const
 	DrawFormatString(400, 10, 0x000000, "X %f Y %f", Location.x, Location.y);
 	DrawFormatString(10, 100, 0x000000, "1：左 2：右 3：上 4：下\n動く方向 %d", static_cast<int>(Move));
 	DrawFormatString(10, 140, 0x000000, "0:default 1：ground 2：sky\njstate %d", static_cast<int>(jState));
-	DrawFormatString(0, 180, 0x000000, "HitBlock[0] %d 座標 %d", HitBlock[0], HitBlock[0] * BLOCK_SIZE);
-	DrawFormatString(0, 220, 0x000000, "HitBlock[1] %d 座標 %d", HitBlock[1], HitBlock[1] * BLOCK_SIZE);
 	DrawFormatString(0, 260, 0x000000, "1：左 2：右 3：上 4：下\nSide %d", (int)side);
 	//DrawFormatString(10, 180, 0xffffff, "0:Stop 1:Walk 2:Dash\n mState %d", static_cast<int>(mState));
 	DrawFormatString(300, 30, 0x000000, "kasoku %f speed %f \nYspeed %f Acceleration %f", kasokudo, Speed, YSpeed,IncrementalAccelerationData[index]);
@@ -196,24 +194,24 @@ void Mario::Hit()
 {
 }
 
-void Mario::HitStage()
+void Mario::HitStage(int h_block, int w_block,int hit_side)
 {
 	VECTOR vec;
 
-	vec.y = static_cast<float>(HitBlock[0] * BLOCK_SIZE);
-	vec.x = static_cast<float>(HitBlock[1] * BLOCK_SIZE);
+	vec.y = static_cast<float>(h_block * BLOCK_SIZE);
+	vec.x = static_cast<float>(w_block * BLOCK_SIZE);
 
-	switch (side) //当たったブロックの辺の位置
+	switch (hit_side) //当たったブロックの辺の位置
 	{
-	case HIT_SIDE::LEFT:  //左側
+	case 1:  //左側
 		Location.x = vec.x - BLOCK_SIZE / 2;
 		flg = false;
 		break;
-	case HIT_SIDE::RIGHT: //右側
+	case 2: //右側
 		Location.x = vec.x + BLOCK_SIZE / 2;
 		flg = false;
 		break;
-	case HIT_SIDE::TOP:   //上側
+	case 3:   //上側
 		Location.y = vec.y - YSize / 2;
 		Move = MOVE_VECTOR::STOP;
 		jState = JUMP_STATE::GROUND;
@@ -221,7 +219,7 @@ void Mario::HitStage()
 		flg = false;
 
 		break;
-	case HIT_SIDE::UNDER: //下側
+	case 4: //下側
 		Location.y = vec.y + YSize;
 		//降下準備
 		Move = MOVE_VECTOR::DOWN;
