@@ -180,7 +180,6 @@ void Mario::Draw() const
 	DrawFormatString(0, 260, 0x000000, "1：左 2：右 3：上 4：下\nSide %d", (int)side);
 	//DrawFormatString(10, 180, 0xffffff, "0:Stop 1:Walk 2:Dash\n mState %d", static_cast<int>(mState));
 	DrawFormatString(300, 30, 0x000000, "kasoku %f speed %f \nYspeed %f Acceleration %f", kasokudo, Speed, YSpeed,IncrementalAccelerationData[index]);
-	DrawFormatString(400, 400, 0x000000, "Move %d", Move);
 
 	if (flg)
 	{
@@ -207,11 +206,11 @@ void Mario::HitStage()
 	switch (side) //当たったブロックの辺の位置
 	{
 	case HIT_SIDE::LEFT:  //左側
-		Location.x = vec.x - XSize / 2;
+		Location.x = vec.x - BLOCK_SIZE / 2;
 		flg = false;
 		break;
 	case HIT_SIDE::RIGHT: //右側
-		Location.x = vec.x + XSize / 2;
+		Location.x = vec.x + BLOCK_SIZE / 2;
 		flg = false;
 		break;
 	case HIT_SIDE::TOP:   //上側
@@ -223,10 +222,10 @@ void Mario::HitStage()
 
 		break;
 	case HIT_SIDE::UNDER: //下側
-		Location.y = vec.y + YSize / 2;
+		Location.y = vec.y + YSize;
 		//降下準備
 		Move = MOVE_VECTOR::DOWN;
-		kasokudo += Fallkasokudo;
+		kasokudo += MaxFallSpeed;
 		break;
 	}
 }
@@ -402,7 +401,7 @@ void Mario::Animation()
 	{
 		if (mState == MOVE_STATE::WALK)
 		{
-			if (++AnimWait % AnimSpeed == 0)
+			if (AnimSpeed < ++AnimWait)
 			{
 				if (State == STATE::SMALL)
 				{
@@ -418,11 +417,13 @@ void Mario::Animation()
 						aIndex = 2;
 					}
 				}
+
+				AnimWait = 0;
 			}
 		}
 		else if (mState == MOVE_STATE::DASH)
 		{
-			if (++AnimWait % (AnimSpeed / 2) == 0)
+			if ((AnimSpeed / 2) < ++AnimWait)
 			{
 				if (State == STATE::SMALL)
 				{
@@ -438,6 +439,7 @@ void Mario::Animation()
 						aIndex = 2;
 					}
 				}
+				AnimWait = 0;
 			}
 		}
 		//入力方向から反対に入力した時に

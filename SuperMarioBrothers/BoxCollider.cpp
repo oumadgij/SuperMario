@@ -68,13 +68,13 @@ bool BoxCollider::ChackHitStage(int stage[][211], int jState, int move_vector, f
     */
     int check_y = 0;
     int check_x = 0;
-    //¶‚ÉˆÚ“®‚µ‚Ä‚¢‚é
-    if (move_vector == 1)
+    //‰E‚ÉˆÚ“®‚µ‚Ä‚¢‚é
+    if (move_vector == 2)
     {
         check_x = 1;
     }
-    //ã‚ÉˆÚ“®‚µ‚Ä‚¢‚é
-    if (move_vector == 3)
+    //‰º‚ÉˆÚ“®‚µ‚Ä‚¢‚é
+    if (move_vector == 4)
     {
         check_y = 1;
     }
