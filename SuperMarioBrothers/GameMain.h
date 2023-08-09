@@ -22,8 +22,6 @@ public:
 	virtual void Draw() const override;
 
 private:
-	int StageData[15][211];    //ステージデータを入れる変数
-	int BackData[15][211]; //背景データを入れる変数
 	float ScrollX = 0.0f;  //横スクロール
 	Stage stage;
 	Mario* mario;

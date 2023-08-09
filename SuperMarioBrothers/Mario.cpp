@@ -173,11 +173,13 @@ void Mario::Draw() const
 	/*DrawFormatString(10, 10, 0xffffff, "左上のステージ位置\nX %d Y %d", static_cast<int>((Location.x-XSize/2) / BLOCK_SIZE), static_cast<int>((Location.y-YSize/2) / BLOCK_SIZE));
 	DrawFormatString(10, 50, 0xffffff, "右下のステージ位置\nX %d Y %d", static_cast<int>((Location.x + XSize/2) / BLOCK_SIZE), static_cast<int>((Location.y + YSize/2) / BLOCK_SIZE));*/
 	DrawFormatString(400, 10, 0x000000, "X %f Y %f", Location.x, Location.y);
-	DrawFormatString(10, 100, 0x000000, "1：左 2：右 3：上 4：下\n動く方向 %d", static_cast<int>(Move));
+	/*DrawFormatString(10, 100, 0x000000, "1：左 2：右 3：上 4：下\n動く方向 %d", static_cast<int>(Move));
 	DrawFormatString(10, 140, 0x000000, "0:default 1：ground 2：sky\njstate %d", static_cast<int>(jState));
-	DrawFormatString(0, 260, 0x000000, "1：左 2：右 3：上 4：下\nSide %d", (int)side);
+	DrawFormatString(0, 260, 0x000000, "1：左 2：右 3：上 4：下\nSide %d", (int)side);*/
 	//DrawFormatString(10, 180, 0xffffff, "0:Stop 1:Walk 2:Dash\n mState %d", static_cast<int>(mState));
 	DrawFormatString(300, 30, 0x000000, "kasoku %f speed %f \nYspeed %f Acceleration %f", kasokudo, Speed, YSpeed,IncrementalAccelerationData[index]);
+
+	DrawCircle(Location.x, Location.y, 3, 0x00ff00, TRUE, 2);
 
 	if (flg)
 	{

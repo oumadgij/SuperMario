@@ -5,28 +5,55 @@
 
 Stage::Stage()
 {
+    Push = 0.0f;
+
+    //データの読み込み
+    if (LoadStages() == -1)
+    {
+        perror("LoadStage Error");
+        throw;
+    }
+    if (LoadBack() == -1)
+    {
+        perror("LoadBack Error");
+        throw;
+    }
+    //画像の読み込み
+    if (LoadImages() == -1)
+    {
+        perror("LoadImage Error");
+        throw;
+    }
 }
 
-void Stage::Draw(const int stage[][211],const int back[][211], const float sx) const
+void Stage::Draw(const float sx) const
 {
 	for (int i = 0; i < STAGE_HEIGHT; i++)
 	{
 		for (int j = 0; j < STAGE_WIDTH; j++)
 		{
 			//背景を描画
-			DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, BackImages[back[i][j]], TRUE);
+			DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, BackImages[BackData[i][j]], TRUE);
+
+            //マリオがぶつかったブロックなら
+            //pを変化させる
+            int p = 0;
+            if ((i == PushBlock[0])&&(j == PushBlock[1]))
+            {
+                p = Push;//Push
+            }
 
 			//ステージを描画
-			switch (stage[i][j])
+			switch (StageData[i][j])
 			{
 			case 1:  //フロアブロック
 				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, Floor, TRUE);
 				break;
 			case 2:  //普通のブロック
-				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, Block, TRUE);
+				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE + p, Block, TRUE);
 				break;
 			case 3:  //ハテナブロック
-				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, QuestionBlock[0], TRUE);
+				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE + p, QuestionBlock[0], TRUE);
 				break;
 			case 4:  //空ブロック
 				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, EmptyBlock, TRUE);
@@ -52,13 +79,16 @@ void Stage::Draw(const int stage[][211],const int back[][211], const float sx) c
 
 #define DEBUG
 #ifdef DEBUG
+    DrawFormatString(0, 260, 0x000000, "down %d", down);
+    DrawFormatString(0, 100, 0x000000, "Push %f", Push);
+    DrawFormatString(0, 140, 0x000000, "1：左 2：右 3：上 4：下\nSide：%d", (int)Side);
     DrawFormatString(0, 180, 0x000000, "HitBlock[0] %d 座標 %d", HitBlock[0], HitBlock[0] * BLOCK_SIZE);
     DrawFormatString(0, 220, 0x000000, "HitBlock[1] %d 座標 %d", HitBlock[1], HitBlock[1] * BLOCK_SIZE);
 #endif // DEBUG
 
 }
 
-int Stage::LoadStages(int stage[][211])
+int Stage::LoadStages()
 {
 	FILE* fp;
 	char buf[1000];
@@ -77,14 +107,14 @@ int Stage::LoadStages(int stage[][211])
 	while (fgets(buf, sizeof(buf), fp) != NULL)
 	{
 		p = strtok(buf, ",");
-		ret = sscanf(p, "%d", &stage[i][j++]);
+		ret = sscanf(p, "%d", &StageData[i][j++]);
 
 		while (p != NULL)
 		{
 			p = strtok(NULL, ",");
 			if (p != NULL)
 			{
-				ret = sscanf(p, "%d", &stage[i][j++]);
+				ret = sscanf(p, "%d", &StageData[i][j++]);
 			}
 		}
 
@@ -96,7 +126,7 @@ int Stage::LoadStages(int stage[][211])
 	return 0;
 }
 
-int Stage::LoadBack(int back[][211])
+int Stage::LoadBack()
 {
 	//背景データを読み込む
 	FILE* fp;
@@ -113,14 +143,14 @@ int Stage::LoadBack(int back[][211])
 	while (fgets(buf, sizeof(buf), fp) != NULL)
 	{
 		p = strtok(buf, ",");
-		ret = sscanf(p, "%d", &back[i][j++]);
+		ret = sscanf(p, "%d", &BackData[i][j++]);
 
 		while (p != NULL)
 		{
 			p = strtok(NULL, ",");
 			if (p != NULL)
 			{
-				ret = sscanf(p, "%d", &back[i][j++]);
+				ret = sscanf(p, "%d", &BackData[i][j++]);
 			}
 		}
 
@@ -174,8 +204,8 @@ int Stage::LoadImages()
 }
 
 //当たり判定をとる(false：当たっていない true：当たっている)
-bool Stage::ChackHitStage(const int stage[][211], int jState
-    , VECTOR location, int x_size, int y_size
+bool Stage::ChackHitStage(int jState, VECTOR location
+    , int x_size, int y_size
     , int move_vector, float scroll)
 {
     /*
@@ -260,7 +290,7 @@ bool Stage::ChackHitStage(const int stage[][211], int jState
     {
         for (int w = static_cast<int>(vertex[start + check_x][1]); w <= vertex[end][1]; w++)
         {
-            if (stage[h][w] != 0 && stage[h][w] < 50)  //ブロックが当たった時
+            if (StageData[h][w] != 0 && StageData[h][w] < 50)  //ブロックが当たった時
             {
                 switch (move_vector)
                 {
@@ -332,8 +362,8 @@ bool Stage::ChackHitStage(const int stage[][211], int jState
     return false;
 }
 
-bool Stage::ChackUnder(const int stage[][211], float scroll
-    , VECTOR location, int x_size, int y_size)
+bool Stage::ChackUnder(float scroll, VECTOR location
+    , int x_size, int y_size)
 {
     /*自身の判定する範囲を求める*/
     VECTOR vertex[2];
@@ -355,11 +385,54 @@ bool Stage::ChackUnder(const int stage[][211], float scroll
     {
         for (int w = (int)vertex[end].x; w <= (int)vertex[end].x; w++)
         {
-            if (stage[h][w] == 0)
+            if (StageData[h][w] == 0)
             {
                 return true;
             }
         }
     }
     return false;
+}
+
+void Stage::MoveBlockPreparation(float scroll)
+{
+    down = 1;
+    PushSpeed = 0.8f;
+    SaveSide = Side;
+    PushBlock[0] = HitBlock[0] - 1;
+    PushBlock[1] = HitBlock[1] + scroll / BLOCK_SIZE + 1;
+}
+
+void Stage::MoveBlock()
+{
+    if (SaveSide == HIT_SIDE::UNDER)//StageData[h][w] <= 3
+    {
+        if (down == 1)
+        {
+            sec = 0;
+            Push -= PushSpeed;
+        }
+        else if (down == 2)
+        {
+            sec = 0;
+            Push += PushSpeed;
+        }
+
+        if (Push < (BLOCK_SIZE / 2) * -1)
+        {
+            down = 2;
+        }
+
+        if (0 < Push)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                HitBlock[i] = -1;
+            }
+            Push = 0;
+            Side = HIT_SIDE::DEFAULT;
+            SaveSide = HIT_SIDE::DEFAULT;
+        }
+       
+    }
 }
