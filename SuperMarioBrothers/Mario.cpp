@@ -137,12 +137,16 @@ void Mario::Update()
 		State = STATE::BIG;
 		Location.x = 6 * BLOCK_SIZE;
 		Location.y = 11 * BLOCK_SIZE;
+		XSize = BIG_MARIO_WIDTH_SIZE;
+		YSize = BIG_MARIO_HEIGTH_SIZE;
 	}
 	if (mari == 1)
 	{
 		State = STATE::SMALL;
 		Location.x = 6 * BLOCK_SIZE;
 		Location.y = 12 * BLOCK_SIZE;
+		XSize = SMALL_MARIO_SIZE;
+		YSize = SMALL_MARIO_SIZE;
 	}
 #endif // !DEBUG
 
@@ -172,12 +176,14 @@ void Mario::Draw() const
 #ifdef DEBUG
 	/*DrawFormatString(10, 10, 0xffffff, "左上のステージ位置\nX %d Y %d", static_cast<int>((Location.x-XSize/2) / BLOCK_SIZE), static_cast<int>((Location.y-YSize/2) / BLOCK_SIZE));
 	DrawFormatString(10, 50, 0xffffff, "右下のステージ位置\nX %d Y %d", static_cast<int>((Location.x + XSize/2) / BLOCK_SIZE), static_cast<int>((Location.y + YSize/2) / BLOCK_SIZE));*/
-	DrawFormatString(400, 10, 0x000000, "X %f Y %f", Location.x, Location.y);
+	//DrawFormatString(400, 10, 0x000000, "X %f Y %f", Location.x, Location.y);
 	/*DrawFormatString(10, 100, 0x000000, "1：左 2：右 3：上 4：下\n動く方向 %d", static_cast<int>(Move));
 	DrawFormatString(10, 140, 0x000000, "0:default 1：ground 2：sky\njstate %d", static_cast<int>(jState));
 	DrawFormatString(0, 260, 0x000000, "1：左 2：右 3：上 4：下\nSide %d", (int)side);*/
 	//DrawFormatString(10, 180, 0xffffff, "0:Stop 1:Walk 2:Dash\n mState %d", static_cast<int>(mState));
-	DrawFormatString(300, 30, 0x000000, "kasoku %f speed %f \nYspeed %f Acceleration %f", kasokudo, Speed, YSpeed,IncrementalAccelerationData[index]);
+	//DrawFormatString(300, 30, 0x000000, "kasoku %f speed %f \nYspeed %f Acceleration %f", kasokudo, Speed, YSpeed,IncrementalAccelerationData[index]);
+
+	DrawFormatString(0, 260, 0x000000, "マリオ 中央\nX %d Y %d", (int)Location.x/BLOCK_SIZE,(int)Location.y/BLOCK_SIZE);
 
 	DrawCircle(Location.x, Location.y, 3, 0x00ff00, TRUE, 2);
 

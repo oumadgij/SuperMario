@@ -24,54 +24,64 @@ Stage::Stage()
         perror("LoadImage Error");
         throw;
     }
+
+    for (int i = 0; i < STAGE_HEIGHT_BLOCK; i++)
+    {
+        for (int j = 0; j < STAGE_WIDTH_BLOCK; j++)
+        {
+            ChackStage[i][j] = StageData[i][j];
+        }
+    }
 }
 
-void Stage::Draw(const float sx) const
+void Stage::Draw() const
 {
 	for (int i = 0; i < STAGE_HEIGHT; i++)
 	{
 		for (int j = 0; j < STAGE_WIDTH; j++)
 		{
 			//背景を描画
-			DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, BackImages[BackData[i][j]], TRUE);
+			DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, BackImages[BackData[i][j]], TRUE);
 
             //マリオがぶつかったブロックなら
             //pを変化させる
             int p = 0;
             if ((i == PushBlock[0])&&(j == PushBlock[1]))
             {
-                p = Push;//Push
+                p = Push;
             }
 
 			//ステージを描画
 			switch (StageData[i][j])
 			{
 			case 1:  //フロアブロック
-				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, Floor, TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Floor, TRUE);
 				break;
 			case 2:  //普通のブロック
-				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE + p, Block, TRUE);
+            case 32:
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE + p, Block, TRUE);
 				break;
 			case 3:  //ハテナブロック
-				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE + p, QuestionBlock[0], TRUE);
+            case 30:
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE + p, QuestionBlock[0], TRUE);
 				break;
 			case 4:  //空ブロック
-				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, EmptyBlock, TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, EmptyBlock, TRUE);
 				break;
 			case 6:  //階段ブロック
-				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, StairsBlock, TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, StairsBlock, TRUE);
 				break;
 			case 7:  //土管
-				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, Pipe[0], TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Pipe[0], TRUE);
 				break;
 			case 8:	//土管
-				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, Pipe[1], TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Pipe[1], TRUE);
 				break;
 			case 9:	//土管
-				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, Pipe[2], TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Pipe[2], TRUE);
 				break;
 			case 10://土管
-				DrawGraph(j * BLOCK_SIZE - sx, i * BLOCK_SIZE, Pipe[3], TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Pipe[3], TRUE);
 				break;
 			}
 		}
@@ -79,11 +89,31 @@ void Stage::Draw(const float sx) const
 
 #define DEBUG
 #ifdef DEBUG
+    for (int i = 0; i < 15; i++)
+    {
+        DrawFormatString(285, 15 + i * 10, 0x00ff00, "%d", i);
+    }
+    for (int j = 0; j < 20; j++)
+    {
+        DrawFormatString(300+j*15, 0, 0x00ff00, "%d", j);
+    }
+
+    for (int i = 0; i < 15; i++)
+    {
+        for (int j = 0; j < 20; j++)
+        {
+            DrawFormatString(300 + j * 15, 15 + i * 10,0x000000, "%d", ChackStage[i][j]);
+        }
+    }
+
+    DrawFormatString(400, 250, 0x000000, "scroll %d  / %d", ScrollX, ScrollX / BLOCK_SIZE);
     DrawFormatString(0, 260, 0x000000, "down %d", down);
     DrawFormatString(0, 100, 0x000000, "Push %f", Push);
     DrawFormatString(0, 140, 0x000000, "1：左 2：右 3：上 4：下\nSide：%d", (int)Side);
-    DrawFormatString(0, 180, 0x000000, "HitBlock[0] %d 座標 %d", HitBlock[0], HitBlock[0] * BLOCK_SIZE);
-    DrawFormatString(0, 220, 0x000000, "HitBlock[1] %d 座標 %d", HitBlock[1], HitBlock[1] * BLOCK_SIZE);
+    DrawFormatString(0, 180, 0x000000, "HitBlock h %d 座標 %d", HitBlock[0], HitBlock[0] * BLOCK_SIZE);
+    DrawFormatString(0, 220, 0x000000, "HitBlock w %d 座標 %d", HitBlock[1], HitBlock[1] * BLOCK_SIZE);
+    DrawFormatString(10, 10, 0xffffff, "左下のステージ位置\nX %d Y %d", vertex[0][1],vertex[0][0]);
+    DrawFormatString(10, 50, 0xffffff, "右下のステージ位置\nX %d Y %d", vertex[1][1], vertex[1][0]);
 #endif // DEBUG
 
 }
@@ -203,40 +233,33 @@ int Stage::LoadImages()
 	return 0;
 }
 
-//当たり判定をとる(false：当たっていない true：当たっている)
-bool Stage::ChackHitStage(int jState, VECTOR location
-    , int x_size, int y_size
-    , int move_vector, float scroll)
+void Stage::ChackStagePreparation(VECTOR location, int x_size, int y_size)
 {
+    //判定するステージの範囲を求める
+    for (int h = 0; h < STAGE_HEIGHT_BLOCK; h++)
+    {
+        for (int w = 0; w < STAGE_WIDTH_BLOCK; w++)
+        {
+            ChackStage[h][w] = StageData[h][w + ScrollX / BLOCK_SIZE];
+        }
+    }
+
     /*
     * 自身の判定する範囲を求める
     *  ※範囲は矩形の開始座標を含むため
     *    終了位置を求めるときは、サイズを-1してから求める
     */
-    float vertex[2][2];
     //開始位置(左上)
     //Y座標
-    vertex[0][0] = (location.y - y_size / 2) / BLOCK_SIZE;
+    vertex[0][0] = ((int)location.y - y_size / 2) / BLOCK_SIZE;
     //X座標
-    vertex[0][1] = (location.x - x_size / 2) / BLOCK_SIZE + scroll / BLOCK_SIZE;
+    vertex[0][1] = ((int)location.x - x_size / 2) / BLOCK_SIZE;
 
     //終了位置(右下)
     //Y座標
-    vertex[1][0] = (location.y + (y_size / 2 - 1)) / BLOCK_SIZE;
+    vertex[1][0] = ((int)location.y + (y_size / 2 - 1)) / BLOCK_SIZE;
     //X座標
-    vertex[1][1] = (location.x + (x_size / 2 - 1)) / BLOCK_SIZE + scroll / BLOCK_SIZE;
-    //VECTOR vertex[2];
-    ////開始位置(左上)
-    // //X座標
-    //vertex[0].x = (Location.x - XSize / 2) / BLOCK_SIZE + scroll / BLOCK_SIZE;
-    // //Y座標
-    //vertex[0].y = (Location.y - YSize / 2) / BLOCK_SIZE;
-
-    ////終了位置(右下)
-    // //X座標
-    //vertex[1].x = (Location.x + (XSize/2 - 1)) / BLOCK_SIZE + scroll / BLOCK_SIZE;
-    // //Y座標
-    //vertex[1].y = (Location.y + (YSize/2 - 1)) / BLOCK_SIZE;
+    vertex[1][1] = ((int)location.x + (x_size / 2 - 1)) / BLOCK_SIZE;
 
     /*自身がステージの範囲を超えていないかチェック*/
     for (int i = 0; i < 2; i++)
@@ -244,7 +267,7 @@ bool Stage::ChackHitStage(int jState, VECTOR location
         //Y座標をチェック
         if (STAGE_HEIGHT_BLOCK < vertex[i][0]) //ステージより大きいか
         {
-            vertex[i][0] = STAGE_HEIGHT_BLOCK - 1;
+            vertex[i][0] = STAGE_HEIGHT_BLOCK;
         }
         //X座標をチェック
         if (vertex[i][1] < 0) //0より小さいか
@@ -252,20 +275,11 @@ bool Stage::ChackHitStage(int jState, VECTOR location
             vertex[i][1] = 0;
         }
     }
-    //for (int i = 0; i < 2; i++)
-    //{
-    //    //X座標をチェック
-    //    if (vertex[i].x < 0) //0より小さいか
-    //    {
-    //        vertex[i].x = 0;
-    //    }
-    //    //Y座標をチェック
-    //    if (STAGE_HEIGHT_BLOCK < vertex[i].y) //ステージより大きいか
-    //    {
-    //        vertex[i].y = STAGE_HEIGHT_BLOCK - 1;
-    //    }
-    //}
+}
 
+//当たり判定をとる(false：当たっていない true：当たっている)
+bool Stage::ChackHitStage(int move_vector)
+{
     /*
     * 動く向きによって
     * 判定する辺を割り出す
@@ -276,9 +290,8 @@ bool Stage::ChackHitStage(int jState, VECTOR location
     if (move_vector == 2)
     {
         check_x = 1;
-    }
-    //下に移動している
-    if (move_vector == 4)
+    }//下に移動している
+    else if (move_vector == 4)
     {
         check_y = 1;
     }
@@ -286,11 +299,16 @@ bool Stage::ChackHitStage(int jState, VECTOR location
     int start = 0;
     int end = 1;
     /*判定する範囲にブロックがないかチェック*/
-    for (int h = static_cast<int>(vertex[start + check_y][0]); h <= vertex[end][0]; h++)
+    for (int h = vertex[start][0] + check_y; h <= vertex[end][0]; h++)
     {
-        for (int w = static_cast<int>(vertex[start + check_x][1]); w <= vertex[end][1]; w++)
+        if (STAGE_HEIGHT_BLOCK == h)
         {
-            if (StageData[h][w] != 0 && StageData[h][w] < 50)  //ブロックが当たった時
+            break;
+        }
+
+        for (int w = vertex[start][1] + check_x; w <= vertex[end][1]; w++)
+        {
+            if (ChackStage[h][w] != 0 && ChackStage[h][w] < 50)  //ブロックが当たった時
             {
                 switch (move_vector)
                 {
@@ -311,7 +329,9 @@ bool Stage::ChackHitStage(int jState, VECTOR location
                 }
 
                 HitBlock[0] = h;
-                HitBlock[1] = w - scroll / BLOCK_SIZE;
+                HitBlock[1] = w;
+                play[0] = h;
+                play[1] = w;
 
                 return true;  //ブロックに当たっている
             }
@@ -362,30 +382,15 @@ bool Stage::ChackHitStage(int jState, VECTOR location
     return false;
 }
 
-bool Stage::ChackUnder(float scroll, VECTOR location
-    , int x_size, int y_size)
+bool Stage::ChackUnder()
 {
-    /*自身の判定する範囲を求める*/
-    VECTOR vertex[2];
-    //左下
-    //Y座標
-    vertex[0].y = (location.y + y_size / 2) / BLOCK_SIZE;
-    //X座標
-    vertex[0].x = (location.x - x_size / 2) / BLOCK_SIZE + scroll / BLOCK_SIZE;
-
-    //右下
-    //Y座標
-    vertex[1].y = (location.y + y_size / 2) / BLOCK_SIZE;
-    //X座標
-    vertex[1].x = (location.x + (x_size / 2 - 1)) / BLOCK_SIZE + scroll / BLOCK_SIZE;
-
     int start = 0;
     int end = 1;
-    for (int h = (int)vertex[start].y; h <= (int)vertex[end].y; h++)
+    for (int h = vertex[start][0]; h <= vertex[end][0]; h++)
     {
-        for (int w = (int)vertex[end].x; w <= (int)vertex[end].x; w++)
+        for (int w = vertex[end][1]; w <= vertex[end][1]; w++)
         {
-            if (StageData[h][w] == 0)
+            if (ChackStage[h+1][w] == 0)
             {
                 return true;
             }
@@ -394,18 +399,19 @@ bool Stage::ChackUnder(float scroll, VECTOR location
     return false;
 }
 
-void Stage::MoveBlockPreparation(float scroll)
+void Stage::MoveBlockPreparation()
 {
     down = 1;
     PushSpeed = 0.8f;
     SaveSide = Side;
+    Side = HIT_SIDE::DEFAULT;
     PushBlock[0] = HitBlock[0] - 1;
-    PushBlock[1] = HitBlock[1] + scroll / BLOCK_SIZE + 1;
+    PushBlock[1] = HitBlock[1] + ScrollX / BLOCK_SIZE;
 }
 
 void Stage::MoveBlock()
 {
-    if (SaveSide == HIT_SIDE::UNDER)//StageData[h][w] <= 3
+    if (SaveSide == HIT_SIDE::UNDER)
     {
         if (down == 1)
         {
@@ -423,6 +429,7 @@ void Stage::MoveBlock()
             down = 2;
         }
 
+        //元の位置に戻ったらリセット
         if (0 < Push)
         {
             for (int i = 0; i < 2; i++)
@@ -430,7 +437,6 @@ void Stage::MoveBlock()
                 HitBlock[i] = -1;
             }
             Push = 0;
-            Side = HIT_SIDE::DEFAULT;
             SaveSide = HIT_SIDE::DEFAULT;
         }
        

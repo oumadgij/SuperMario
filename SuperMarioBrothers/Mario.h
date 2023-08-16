@@ -72,7 +72,7 @@ private:
 	int AnimSpeed = 10;  //画像切り替えスピード
 	int AnimWait;
 	int aIndex = 0;      //画像の添え字
-	bool Turn = false;   //反転するかどうか
+	bool Turn = false;   //反転するかどうか (true：する false：しない)
 
 	//TO DO いづれ消す
 	int mari = 0;

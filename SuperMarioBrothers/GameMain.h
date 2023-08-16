@@ -22,7 +22,6 @@ public:
 	virtual void Draw() const override;
 
 private:
-	float ScrollX = 0.0f;  //‰¡ƒXƒNƒ[ƒ‹
 	Stage stage;
 	Mario* mario;
 };
