@@ -2,6 +2,7 @@
 #include "SceneManager.h"
 #include "Stage.h"
 #include "Mario.h"
+#include "Item.h"
 class GameMain :
     public AbstractScene
 {
@@ -24,5 +25,6 @@ public:
 private:
 	Stage stage;
 	Mario* mario;
+	Item** item;
 };
 

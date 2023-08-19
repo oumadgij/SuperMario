@@ -37,9 +37,12 @@ public:
 
 	int GetHitSide()const { return (int)Side; }
 	int GetHitBlock(int i)const { return HitBlock[i]; }
+	int GetPushBlock(int i)const {return PushBlock[i]; }
+	int GetStage(int h, int w)const { return ChackStage[h][w]; }
+	int GetScroll()const { return ScrollX; }
 
 	//to do
-	int GetScroll()const { return ScrollX; }
+	bool GetPushEnd()const { return PushEnd; }
 	//消す
 private:
 	int StageData[15][211];    //ステージデータを入れる変数
@@ -61,12 +64,12 @@ private:
 
 	HIT_SIDE Side;
 	HIT_SIDE SaveSide;
-	int HitBlock[2] = { 0,0 };  //当たったステージブロックの座標
+	int HitBlock[2] = { 0,0 };  //当たったステージブロックの座標 0：縦 1：横
 	float Push;
 	float PushSpeed;
 	int sec = 0;
 	int down = 2;
-	int PushBlock[2] = { -1,-1 }; //押し出すブロック
+	int PushBlock[2] = { -1,-1 }; //押し出すブロック 0：縦 1：横
 	int ScrollX = 0;  //横スクロール
 
 	//判定する自身の範囲
@@ -74,6 +77,7 @@ private:
 	//to do
 	int play[2];
 	int ChackStage[15][20];
+	bool PushEnd = false;  //押し出しが終わったか  false ：終わっていない true：終わっている
 	//消す
 };
 

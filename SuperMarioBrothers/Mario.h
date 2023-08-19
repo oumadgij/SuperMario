@@ -31,6 +31,7 @@ public:
 	void Fall();
 	float GetSpeed()const { return Speed; }
 	int GetMoveVector()const { return (int)Move; }
+	int GetStage()const { return (int)State; }
 
 
 	//TO DO‚¢‚Ã‚êÁ‚·

@@ -63,10 +63,10 @@ void Stage::Draw() const
 				break;
 			case 3:  //ハテナブロック
             case 30:
-				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE + p, QuestionBlock[0], TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, QuestionBlock[0], TRUE);
 				break;
 			case 4:  //空ブロック
-				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, EmptyBlock, TRUE);
+				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE + p, EmptyBlock, TRUE);
 				break;
 			case 6:  //階段ブロック
 				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, StairsBlock, TRUE);
@@ -112,6 +112,8 @@ void Stage::Draw() const
     DrawFormatString(0, 140, 0x000000, "1：左 2：右 3：上 4：下\nSide：%d", (int)Side);
     DrawFormatString(0, 180, 0x000000, "HitBlock h %d 座標 %d", HitBlock[0], HitBlock[0] * BLOCK_SIZE);
     DrawFormatString(0, 220, 0x000000, "HitBlock w %d 座標 %d", HitBlock[1], HitBlock[1] * BLOCK_SIZE);
+   /* DrawFormatString(0, 180, 0x000000, "PushBlock h %d", PushBlock[0]);
+    DrawFormatString(0, 220, 0x000000, "PushBlock w %d", PushBlock[1]);*/
     DrawFormatString(10, 10, 0xffffff, "左下のステージ位置\nX %d Y %d", vertex[0][1],vertex[0][0]);
     DrawFormatString(10, 50, 0xffffff, "右下のステージ位置\nX %d Y %d", vertex[1][1], vertex[1][0]);
 #endif // DEBUG
@@ -407,6 +409,14 @@ void Stage::MoveBlockPreparation()
     Side = HIT_SIDE::DEFAULT;
     PushBlock[0] = HitBlock[0] - 1;
     PushBlock[1] = HitBlock[1] + ScrollX / BLOCK_SIZE;
+    PushEnd = false;
+
+    //アイテムがある所は空ブロックにする
+    if (StageData[PushBlock[0]][PushBlock[1]] == 30
+        || StageData[PushBlock[0]][PushBlock[1]] == 3)
+    {
+        StageData[PushBlock[0]][PushBlock[1]] = 4;
+    }
 }
 
 void Stage::MoveBlock()
@@ -438,6 +448,7 @@ void Stage::MoveBlock()
             }
             Push = 0;
             SaveSide = HIT_SIDE::DEFAULT;
+            PushEnd = true;
         }
        
     }

@@ -154,6 +154,7 @@
     <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="CharaBase.cpp" />
     <ClCompile Include="GameMain.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mario.cpp" />
     <ClCompile Include="PadInput.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="CharaBase.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="GameMain.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="Mario.h" />
     <ClInclude Include="PadInput.h" />
     <ClInclude Include="SceneManager.h" />
