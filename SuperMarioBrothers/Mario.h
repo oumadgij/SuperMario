@@ -27,16 +27,14 @@ public:
 	void Update();
 	void Draw()const;
 	virtual void Hit()override;
-	void HitStage(int h_block,int w_block,int hit_side);  //判定後の処理
-	void Fall();
+	void HitStage(int h_block, int w_block, int hit_side);  //判定後の処理
+	virtual void Fall()override;  //降下処理
 	float GetSpeed()const { return Speed; }
-	int GetMoveVector()const { return (int)Move; }
 	int GetStage()const { return (int)State; }
 
 
 	//TO DOいづれ消す
 	bool flg;
-	int GetJState()const { return (int)jState; }
 	//ここまで
 
 private:
@@ -52,11 +50,9 @@ private:
 	float Inertia;       //慣性
 	bool Jumping;        //ジャンプしているか(true：ジャンプしている false：ジャンプしていない)
 	STATE State;         //マリオの状態
-	MOVE_VECTOR Move;    //動く方向
 	MOVE_STATE mState;   //動くときの状態(歩くか走るか)
 
 	/*ジャンプの変数*/
-	JUMP_STATE jState = JUMP_STATE::DEFAULT;
 	float MaxJump = 0.0f;
 	float kasokudo = 0.125f;    //加速度
 	float Fallkasokudo = 0.0f;  //落下加速度

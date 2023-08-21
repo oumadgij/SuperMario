@@ -1,5 +1,5 @@
 #pragma once
-#include "BoxCollider.h"
+#include "CharaBase.h"
 
 enum class ITEM_TYPE
 {
@@ -12,7 +12,7 @@ enum class ITEM_TYPE
 	STAR
 };
 
-class Item :public BoxCollider
+class Item :public CharaBase
 {
 public:
 	Item();
@@ -21,9 +21,13 @@ public:
 
 	void Update();
 	void Draw(int scroll)const;
+	virtual void Hit()override;
+	void HitStage(int h_block, int w_block
+		, int hit_side, int scroll);  //判定後の処理
+	void Fall();  //降下処理
 
 	//to do
-	VECTOR Getlocate() { return Location; }
+	//VECTOR Getlocate() { return Location; }
 	//消す
 
 private:
@@ -40,8 +44,8 @@ private:
 	ITEM_TYPE ItemType = ITEM_TYPE::DEFAULT;
 	VECTOR StartLocate;
 	int Locate[2];  //アイテムを出す位置 0：縦 1：横
-	float UpSpeed;
-	float XSpeed = 1.0f;
+	float UpSpeed;  //出現するスピード
+	float FallSpeed;  //落下スピード
 	bool UpEnd;     //アイテム出現完了か?
 	//to do
 	

@@ -66,12 +66,11 @@ void Mario::Update()
 		PreparingJump();
 		Move = MOVE_VECTOR::UP;
 	}
-	else if (jState == JUMP_STATE::GROUND)//ジャンプを可能にする
+	else if (!IsAir)//ジャンプを可能にする
 	{
 		Jumping = true;
-	}
-	if (jState == JUMP_STATE::SKY               //ジャンプしていてBボタンを離した時
-		&& PadInput::OnRelese(XINPUT_BUTTON_B)) //降下する
+	}  //ジャンプしていてBボタンを離した時
+	if (IsAir && PadInput::OnRelese(XINPUT_BUTTON_B)) //降下する
 	{
 		Move = MOVE_VECTOR::DOWN;
 		kasokudo += Fallkasokudo;
@@ -102,7 +101,7 @@ void Mario::Update()
 	}
 
 	/*ジャンプする*/
-	if (jState==JUMP_STATE::SKY)
+	if (IsAir)
 	{
 		Jump();
 	}
@@ -174,8 +173,8 @@ void Mario::Draw() const
 
 #define DEBUG
 #ifdef DEBUG
-	/*DrawFormatString(10, 10, 0xffffff, "左上のステージ位置\nX %d Y %d", static_cast<int>((Location.x-XSize/2) / BLOCK_SIZE), static_cast<int>((Location.y-YSize/2) / BLOCK_SIZE));
-	DrawFormatString(10, 50, 0xffffff, "右下のステージ位置\nX %d Y %d", static_cast<int>((Location.x + XSize/2) / BLOCK_SIZE), static_cast<int>((Location.y + YSize/2) / BLOCK_SIZE));*/
+	DrawFormatString(0, 90, 0xffffff, "M左上のステージ位置\nX %d Y %d", static_cast<int>((Location.x-XSize/2) / BLOCK_SIZE), static_cast<int>((Location.y-YSize/2) / BLOCK_SIZE));
+	DrawFormatString(0, 130, 0xffffff, "M右下のステージ位置\nX %d Y %d", static_cast<int>((Location.x + XSize/2) / BLOCK_SIZE), static_cast<int>((Location.y + YSize/2) / BLOCK_SIZE));
 	//DrawFormatString(400, 10, 0x000000, "X %f Y %f", Location.x, Location.y);
 	/*DrawFormatString(10, 100, 0x000000, "1：左 2：右 3：上 4：下\n動く方向 %d", static_cast<int>(Move));
 	DrawFormatString(10, 140, 0x000000, "0:default 1：ground 2：sky\njstate %d", static_cast<int>(jState));
@@ -183,7 +182,7 @@ void Mario::Draw() const
 	//DrawFormatString(10, 180, 0xffffff, "0:Stop 1:Walk 2:Dash\n mState %d", static_cast<int>(mState));
 	//DrawFormatString(300, 30, 0x000000, "kasoku %f speed %f \nYspeed %f Acceleration %f", kasokudo, Speed, YSpeed,IncrementalAccelerationData[index]);
 
-	DrawFormatString(0, 260, 0x000000, "マリオ 中央\nX %d Y %d", (int)Location.x/BLOCK_SIZE,(int)Location.y/BLOCK_SIZE);
+	//DrawFormatString(0, 260, 0x000000, "マリオ 中央\nX %d Y %d", (int)Location.x/BLOCK_SIZE,(int)Location.y/BLOCK_SIZE);
 
 	DrawCircle(Location.x, Location.y, 3, 0x00ff00, TRUE, 2);
 
@@ -222,7 +221,7 @@ void Mario::HitStage(int h_block, int w_block,int hit_side)
 	case 3:   //上側
 		Location.y = vec.y - YSize / 2;
 		Move = MOVE_VECTOR::STOP;
-		jState = JUMP_STATE::GROUND;
+		IsAir = false;
 		Jumping = false;
 		flg = false;
 
@@ -317,7 +316,7 @@ void Mario::SpeedReduction()
 void Mario::PreparingJump()
 {
 	Jumping = false;
-	jState = JUMP_STATE::SKY;
+	IsAir = true;
 	sec = 0;
 
 	index = 0;
@@ -385,14 +384,14 @@ void Mario::Jump()
 	{
 		Location.y = Ground;
 		Jumping = false;
-		jState = JUMP_STATE::GROUND;
+		IsAir = false;
 	}
 }
 
 void Mario::Animation()
 {
 	//ジャンプしている時
-	if (jState == JUMP_STATE::SKY)
+	if (IsAir)
 	{
 		if (State == STATE::SMALL)
 		{

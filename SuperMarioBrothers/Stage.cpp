@@ -88,7 +88,7 @@ void Stage::Draw() const
 	}
 
 #define DEBUG
-#ifdef DEBUG
+#ifndef DEBUG
     for (int i = 0; i < 15; i++)
     {
         DrawFormatString(285, 15 + i * 10, 0x00ff00, "%d", i);
@@ -235,7 +235,8 @@ int Stage::LoadImages()
 	return 0;
 }
 
-void Stage::ChackStagePreparation(VECTOR location, int x_size, int y_size)
+void Stage::ChackStagePreparation(VECTOR location, int x_size
+    , int y_size)
 {
     //判定するステージの範囲を求める
     for (int h = 0; h < STAGE_HEIGHT_BLOCK; h++)
@@ -262,6 +263,51 @@ void Stage::ChackStagePreparation(VECTOR location, int x_size, int y_size)
     vertex[1][0] = ((int)location.y + (y_size / 2 - 1)) / BLOCK_SIZE;
     //X座標
     vertex[1][1] = ((int)location.x + (x_size / 2 - 1)) / BLOCK_SIZE;
+
+    /*自身がステージの範囲を超えていないかチェック*/
+    for (int i = 0; i < 2; i++)
+    {
+        //Y座標をチェック
+        if (STAGE_HEIGHT_BLOCK < vertex[i][0]) //ステージより大きいか
+        {
+            vertex[i][0] = STAGE_HEIGHT_BLOCK;
+        }
+        //X座標をチェック
+        if (vertex[i][1] < 0) //0より小さいか
+        {
+            vertex[i][1] = 0;
+        }
+    }
+}
+
+void Stage::ItemChackStagePreparation(VECTOR location, int x_size
+    , int y_size)
+{
+    //判定するステージの範囲を求める
+    for (int h = 0; h < STAGE_HEIGHT_BLOCK; h++)
+    {
+        for (int w = 0; w < STAGE_WIDTH_BLOCK; w++)
+        {
+            ChackStage[h][w] = StageData[h][w + ScrollX / BLOCK_SIZE];
+        }
+    }
+
+    /*
+    * 自身の判定する範囲を求める
+    *  ※範囲は矩形の開始座標を含むため
+    *    終了位置を求めるときは、サイズを-1してから求める
+    */
+    //開始位置(左上)
+    //Y座標
+    vertex[0][0] = ((int)location.y - y_size / 2) / BLOCK_SIZE;
+    //X座標
+    vertex[0][1] = ((int)location.x - x_size / 2) / BLOCK_SIZE - ScrollX / BLOCK_SIZE;
+
+    //終了位置(右下)
+    //Y座標
+    vertex[1][0] = ((int)location.y + (y_size / 2 - 1)) / BLOCK_SIZE;
+    //X座標
+    vertex[1][1] = ((int)location.x + (x_size / 2 - 1)) / BLOCK_SIZE - ScrollX / BLOCK_SIZE;
 
     /*自身がステージの範囲を超えていないかチェック*/
     for (int i = 0; i < 2; i++)
@@ -339,47 +385,6 @@ bool Stage::ChackHitStage(int move_vector)
             }
         }
     }
-    //for (int h = static_cast<int>(vertex[start].y); h <= vertex[end].y; h++)
-    //{
-    //    for (int w = static_cast<int>(vertex[start].x); w <= vertex[end].x; w++)
-    //    {
-    //        if (stage[h][w] != 0 && stage[h][w] < 50)  //ブロックが当たった時
-    //        {
-    //            if (jState == 2)
-    //            {
-    //                side = HIT_SIDE::UNDER;
-    //                ++h;
-
-    //                HitBlock[0] = h;
-    //                HitBlock[1] = w - scroll / BLOCK_SIZE;
-    //                return true;
-    //            }
-
-    //            switch (move_vector)
-    //            {
-    //            case 1:
-    //                side = HIT_SIDE::RIGHT;
-    //                ++w;
-    //                break;
-    //            case 2:
-    //                side = HIT_SIDE::LEFT;
-    //                break;
-    //            case 3:
-    //                side = HIT_SIDE::UNDER;
-    //                ++h;
-    //                break;
-    //            case 4:
-    //                side = HIT_SIDE::TOP;
-    //                break;
-    //            }
-
-    //            HitBlock[0] = h;
-    //            HitBlock[1] = w - scroll / BLOCK_SIZE;
-
-    //            return true;  //ブロックに当たっている
-    //        }
-    //    }
-    //}
 
     return false;
 }
@@ -388,7 +393,7 @@ bool Stage::ChackUnder()
 {
     int start = 0;
     int end = 1;
-    for (int h = vertex[start][0]; h <= vertex[end][0]; h++)
+  /*  for (int h = vertex[start][0]; h <= vertex[end][0]; h++)
     {
         for (int w = vertex[end][1]; w <= vertex[end][1]; w++)
         {
@@ -397,8 +402,16 @@ bool Stage::ChackUnder()
                 return true;
             }
         }
+    }*/
+    int h = vertex[1][0];
+    for (int w = vertex[start][1]; w <= vertex[end][1]; w++)
+    {
+        if (ChackStage[h + 1][w] != 0)
+        {
+            return false;
+        }
     }
-    return false;
+    return true;
 }
 
 void Stage::MoveBlockPreparation()

@@ -22,7 +22,11 @@ public:
 	int LoadImages();
 
 	//判定する前準備
-	void ChackStagePreparation(VECTOR location,int x_size,int y_size);
+	//プレイヤー・敵用
+	void ChackStagePreparation(VECTOR location,int x_size,int y_size); //correction：補正値
+	//判定する前準備
+	//アイテム用
+	void ItemChackStagePreparation(VECTOR location, int x_size, int y_size);
 	//ステージの当たり判定
 	bool ChackHitStage(int move_vector);
 	//足元に地面があるかどうか
