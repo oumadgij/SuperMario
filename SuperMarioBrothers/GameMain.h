@@ -22,6 +22,8 @@ public:
 	//•`‰æ‚ÉŠÖ‚·‚é‚±‚Æ‚ðŽÀ‘•
 	virtual void Draw() const override;
 
+	void HitChack();
+
 private:
 	Stage stage;
 	Mario* mario;

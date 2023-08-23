@@ -117,17 +117,6 @@ void Item::Update()
 		{
 			Location.x += Speed;
 		}
-		
-		////左に移動
-		//if (Move == MOVE_VECTOR::LEFT)
-		//{
-		//	Location.x -= Speed;
-		//}
-		////右に移動
-		//if (Move == MOVE_VECTOR::RIGHT)
-		//{
-		//	Location.x += Speed;
-		//}
 
 		if (Move == MOVE_VECTOR::DOWN)
 		{
@@ -163,16 +152,13 @@ void Item::Draw(int scroll) const
 
 #define DEBUG
 #ifdef DEBUG
+	DrawBox(Location.x - scroll, Location.y, Location.x + XSize-scroll, Location.y + YSize, 0xff0000, FALSE);
 	DrawFormatString(0, 150, 0xffffff, "IMoveVector %d", (int)Move);
 	DrawFormatString(0, 20, 0xffffff, "左上 X %d Y %d", ((int)Location.x-XSize/2) / BLOCK_SIZE,((int)Location.y-YSize/2)/BLOCK_SIZE);
 	DrawFormatString(0, 40, 0xffffff, "右下 X %d Y %d", ((int)Location.x + (XSize / 2-1)) / BLOCK_SIZE, ((int)Location.y + (YSize / 2-1)) / BLOCK_SIZE);
 	DrawFormatString(300, 20, 0xffffff, "座標 X %f Y %f", Location.x, Location.y);
 #endif // DEBUG
 
-}
-
-void Item::Hit()
-{
 }
 
 void Item::HitStage(int h_block, int w_block
@@ -187,13 +173,11 @@ void Item::HitStage(int h_block, int w_block
 	{
 	case 1:  //左側
 		Location.x = vec.x - BLOCK_SIZE;
-		Move = MOVE_VECTOR::LEFT; //進行方向を反転する
-		Speed *= -1;
+		Inversion();
 		break;
 	case 2: //右側
 		Location.x = vec.x + BLOCK_SIZE;
-		Move = MOVE_VECTOR::RIGHT;//進行方向を反転する
-		Speed *= -1;
+		Inversion();
 		break;
 	case 3:   //上側
 		Location.y = vec.y - YSize;
@@ -215,6 +199,20 @@ void Item::Fall()
 	Move = MOVE_VECTOR::DOWN;
 	IsAir = true;
 	//Location.y += FallSpeed;
+}
+
+void Item::Inversion()
+{
+	if (Move == MOVE_VECTOR::LEFT)
+	{
+		Move = MOVE_VECTOR::RIGHT;//進行方向を反転する
+	}
+	if (Move == MOVE_VECTOR::RIGHT)
+	{
+		Move = MOVE_VECTOR::LEFT; //進行方向を反転する
+	}
+
+	Speed *= -1;
 }
 
 int Item::LoadImages()

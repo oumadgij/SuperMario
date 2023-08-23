@@ -36,13 +36,20 @@ Stage::Stage()
 
 void Stage::Draw() const
 {
+    //背景を描画
+    for (int i = 0; i < STAGE_HEIGHT; i++)
+    {
+        for (int j = 0; j < STAGE_WIDTH; j++)
+        {
+            DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, BackImages[BackData[i][j]], TRUE);
+        }
+    }
+
+    //ステージを描画
 	for (int i = 0; i < STAGE_HEIGHT; i++)
 	{
 		for (int j = 0; j < STAGE_WIDTH; j++)
 		{
-			//背景を描画
-			DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, BackImages[BackData[i][j]], TRUE);
-
             //マリオがぶつかったブロックなら
             //pを変化させる
             int p = 0;
@@ -51,7 +58,6 @@ void Stage::Draw() const
                 p = Push;
             }
 
-			//ステージを描画
 			switch (StageData[i][j])
 			{
 			case 1:  //フロアブロック
@@ -83,9 +89,23 @@ void Stage::Draw() const
 			case 10://土管
 				DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Pipe[3], TRUE);
 				break;
+            case 11://ポールの先端
+                DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Pole_Top, TRUE);
+                break;
+            case 12://ポール
+                DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Pole, TRUE);
+                break;
+            case 13://城
+                DrawGraph(j * BLOCK_SIZE - ScrollX, i * BLOCK_SIZE, Castle, TRUE);
+                break;
 			}
 		}
 	}
+
+    //ポールの旗
+    DrawGraph(197 * BLOCK_SIZE - ScrollX + BLOCK_SIZE / 2, 3 * BLOCK_SIZE, Pole_Flg, TRUE);
+    //城の旗
+    //DrawGraph(203 * BLOCK_SIZE - ScrollX, 5 * BLOCK_SIZE, Flag, TRUE);
 
 #define DEBUG
 #ifndef DEBUG
@@ -208,6 +228,11 @@ int Stage::LoadImages()
 	if ((Pipe[1] = LoadGraph("1-1image/dokan_right_up.png")) == -1) return -1;
 	if ((Pipe[2] = LoadGraph("1-1image/dokan_left_down.png")) == -1) return -1;
 	if ((Pipe[3] = LoadGraph("1-1image/dokan_right_down.png")) == -1) return -1;
+    if ((Pole = LoadGraph("1-1image/pole_down.png")) == -1) return -1;
+    if ((Pole_Top = LoadGraph("1-1image/pole.png")) == -1) return -1;
+    if ((Pole_Flg = LoadGraph("1-1image/flag.png")) == -1) return -1;
+    if ((Castle = LoadGraph("1-1image/siro1.png")) == -1) return -1;
+    if ((Flag = LoadGraph("1-1image/flag_siro.png")) == -1) return -1;
 	if (LoadDivGraph("1-1image/Block/hatena.png", 4, 4, 1, 32, 32, QuestionBlock) == -1) return -1;
 	/*背景*/
 	//空

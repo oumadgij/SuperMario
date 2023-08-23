@@ -17,7 +17,8 @@ public:
 	CharaBase();
 	virtual ~CharaBase() {};
 
-	virtual void Hit() = 0; //“–‚½‚è”»’è
+	virtual void HitStage(int h_block, int w_block
+		, int hit_side, int scroll) = 0; //“–‚½‚è”»’è
 	VECTOR GetLocation()const { return Location; }
 	virtual void Fall() = 0;  //~‰ºˆ—
 	int GetSizeX()const { return XSize; }

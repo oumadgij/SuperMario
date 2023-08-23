@@ -21,13 +21,17 @@ public:
 
 	void Update();
 	void Draw(int scroll)const;
-	virtual void Hit()override;
-	void HitStage(int h_block, int w_block
-		, int hit_side, int scroll);  //”»’èŒã‚Ìˆ—
-	void Fall();  //~‰ºˆ—
+	//”»’èŒã‚Ìˆ—
+	virtual void HitStage(int h_block, int w_block
+		, int hit_side, int scroll)override;
+	//~‰ºˆ—
+	void Fall();
+	//is•ûŒü‚ğ”½“]
+	void Inversion(); 
+	int GetItemType()const { return static_cast<int>(ItemType); }
 
 	//to do
-	//VECTOR Getlocate() { return Location; }
+	
 	//Á‚·
 
 private:

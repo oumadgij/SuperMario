@@ -20,16 +20,18 @@ Mario::Mario()
 	YSize = SMALL_MARIO_SIZE;
 	Location.x = 3 * BLOCK_SIZE;
 	Location.y = 12 * BLOCK_SIZE+YSize/2;
-	//Location.y = 11 * BLOCK_SIZE + BLOCK_SIZE;
 	Speed = 0.0f;
 	Inertia = 0.2f;
 	AnimWait = 0;
+	Coin = 0;
+	Life = 3;
 	State = STATE::SMALL;
-	//State = STATE::BIG;
 	Move = MOVE_VECTOR::STOP;
 	mState = MOVE_STATE::WALK;
-	LoadDivGraph("1-1image/Mario/dekamario.png", 10, 10, 1, 32, 64, b_marioImg);
-	LoadDivGraph("1-1image/Mario/mario.png", 9, 9, 1, 32, 32, s_marioImg);
+	if (LoadImages() == -1)
+	{
+		throw;
+	}
 }
 
 void Mario::Update()
@@ -126,40 +128,29 @@ void Mario::Update()
 
 #define DEBUG
 #ifndef DEBUG
-	if (PadInput::OnClick(XINPUT_BUTTON_LEFT_SHOULDER))
-	{
-		if (1 < ++mari) mari = 0;
-	}
-
-	if (mari == 0)
-	{
-		State = STATE::BIG;
-		Location.x = 6 * BLOCK_SIZE;
-		Location.y = 11 * BLOCK_SIZE;
-		XSize = BIG_MARIO_WIDTH_SIZE;
-		YSize = BIG_MARIO_HEIGTH_SIZE;
-	}
-	if (mari == 1)
-	{
-		State = STATE::SMALL;
-		Location.x = 6 * BLOCK_SIZE;
-		Location.y = 12 * BLOCK_SIZE;
-		XSize = SMALL_MARIO_SIZE;
-		YSize = SMALL_MARIO_SIZE;
-	}
 #endif // !DEBUG
 
 }
 
 void Mario::Draw() const
 {
-	if (State == STATE::SMALL)
+	switch (State)
 	{
-		DrawRotaGraphF(Location.x, Location.y, 1, 0, s_marioImg[aIndex],TRUE, Turn);
-	}
-	else
-	{
-		DrawRotaGraphF(Location.x, Location.y, 1, 0, b_marioImg[aIndex], TRUE, Turn);
+	case STATE::SMALL:
+		DrawRotaGraphF(Location.x, Location.y, 1, 0, sMario[aIndex], TRUE, Turn);
+		break;
+	case STATE::BIG:
+		DrawRotaGraphF(Location.x, Location.y, 1, 0, bMario[aIndex], TRUE, Turn);
+		break;
+	case STATE::FIRE:
+		DrawRotaGraphF(Location.x, Location.y, 1, 0, fMario[aIndex], TRUE, Turn);
+		break;
+	case STATE::STAR_SMALL:
+		DrawRotaGraphF(Location.x, Location.y, 1, 0, Star_sMario[aIndex], TRUE, Turn);
+		break;
+	case STATE::STAR_BIG:
+		DrawRotaGraphF(Location.x, Location.y, 1, 0, Star_bMario[aIndex], TRUE, Turn);
+		break;
 	}
 
 	if (flg)
@@ -197,11 +188,47 @@ void Mario::Draw() const
 #endif // !DEBUG
 }
 
-void Mario::Hit()
+void Mario::Hit(int item_type)
 {
+	switch (item_type)
+	{
+	case 1: //キノコ
+		State = STATE::BIG;
+		Location.y = 11 * BLOCK_SIZE + BLOCK_SIZE;
+		YSize = BIG_MARIO_HEIGTH_SIZE;
+		XSize = BIG_MARIO_WIDTH_SIZE;
+		break;
+	case 2: //1UPキノコ
+		++Life;
+		break;
+	case 3: //コイン
+	case 4:
+		++Coin;
+		break;
+	case 5: //フラワー
+		if (State == STATE::SMALL)//マリオが小さい時
+		{
+			Location.y = 11 * BLOCK_SIZE + BLOCK_SIZE;
+			YSize = BIG_MARIO_HEIGTH_SIZE;
+			XSize = BIG_MARIO_WIDTH_SIZE;
+		}
+		State = STATE::FIRE;
+		break;
+	case 6: //スター
+		if (State == STATE::SMALL)//マリオが小さい時
+		{
+			State = STATE::STAR_SMALL;
+		}
+		else
+		{
+			State = STATE::STAR_BIG;
+		}
+		break;
+	}
 }
 
-void Mario::HitStage(int h_block, int w_block,int hit_side)
+void Mario::HitStage(int h_block, int w_block
+	, int hit_side, int scroll)
 {
 	VECTOR vec;
 
@@ -393,11 +420,11 @@ void Mario::Animation()
 	//ジャンプしている時
 	if (IsAir)
 	{
-		if (State == STATE::SMALL)
+		if (State == STATE::SMALL || State == STATE::STAR_SMALL)
 		{
 			aIndex = 5;
 		}
-		else if (State == STATE::BIG)
+		else
 		{
 			aIndex = 6;
 		}
@@ -408,14 +435,14 @@ void Mario::Animation()
 		{
 			if (AnimSpeed < ++AnimWait)
 			{
-				if (State == STATE::SMALL)
+				if (State == STATE::SMALL || State == STATE::STAR_SMALL)
 				{
 					if (3 < ++aIndex)
 					{
 						aIndex = 1;
 					}
 				}
-				else if (State == STATE::BIG)
+				else
 				{
 					if (4 < ++aIndex)
 					{
@@ -430,14 +457,14 @@ void Mario::Animation()
 		{
 			if ((AnimSpeed / 2) < ++AnimWait)
 			{
-				if (State == STATE::SMALL)
+				if (State == STATE::SMALL || State == STATE::STAR_SMALL)
 				{
 					if (3 < ++aIndex)
 					{
 						aIndex = 1;
 					}
 				}
-				else if (State == STATE::BIG)
+				else
 				{
 					if (4 < ++aIndex)
 					{
@@ -452,11 +479,11 @@ void Mario::Animation()
 		if (Move == MOVE_VECTOR::RIGHT
 			&& Speed < 0)
 		{
-			if (State == STATE::SMALL)
+			if (State == STATE::SMALL || State == STATE::STAR_SMALL)
 			{
 				aIndex = 4;
 			}
-			else if (State == STATE::BIG)
+			else
 			{
 				aIndex = 5;
 			}
@@ -464,11 +491,11 @@ void Mario::Animation()
 		if (Move == MOVE_VECTOR::LEFT
 			&& 0 < Speed)
 		{
-			if (State == STATE::SMALL)
+			if (State == STATE::SMALL || State == STATE::STAR_SMALL)
 			{
 				aIndex = 4;
 			}
-			else if (State == STATE::BIG)
+			else
 			{
 				aIndex = 5;
 			}
@@ -478,4 +505,14 @@ void Mario::Animation()
 	{
 		aIndex = 0;
 	}
+}
+
+int Mario::LoadImages()
+{
+	if (LoadDivGraph("1-1image/Mario/dekamario.png", 10, 10, 1, 32, 64, bMario) == -1) return -1;
+	if (LoadDivGraph("1-1image/Mario/mario.png", 9, 9, 1, 32, 32, sMario) == -1) return -1;
+	if (LoadDivGraph("1-1image/Mario/faiyamario.png", 9, 9, 1, 32, 64, fMario) == -1) return -1;
+	if (LoadDivGraph("1-1image/Mario/starmario.png", 36, 9, 4, 32, 64, Star_bMario) == -1) return -1;
+	if (LoadDivGraph("1-1image/Mario/starsmallmario.png", 32, 8, 4, 32, 32, Star_sMario) == -1) return -1;
+	return 0;
 }

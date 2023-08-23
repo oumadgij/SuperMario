@@ -44,19 +44,33 @@ AbstractScene* GameMain::Update()
 	{
 		//マリオの位置を戻す
 		mario->HitStage(stage.GetHitBlock(0), stage.GetHitBlock(1)
-			, stage.GetHitSide());
+			, stage.GetHitSide(), 0);
 		mario->flg = true;
 
 		//当たった辺が下の時、ブロックを動かす準備をする
 		if (stage.GetHitSide() == 4)
 		{
 			stage.MoveBlockPreparation();
+
+			//叩かれたブロックの真上にアイテムがいたら進行方向を反転
+			for (int i = 0; i < MAX_ITEM; i++)
+			{
+				if (item[i] != nullptr)
+				{
+					if ((stage.GetPushBlock(0) == (int)item[i]->GetLocation().x / BLOCK_SIZE)
+						&& (stage.GetPushBlock(1) == (int)item[i]->GetLocation().y / BLOCK_SIZE))
+					{
+						item[i]->Inversion();
+					}
+				}
+			}
 		}
 
 		//アイテムがあるブロックの時、アイテムを実体化
 		if (stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)) == 3
 			|| stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)) == 5
-			|| (30 <= stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)) && (stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)) <= 32)))
+			|| (30 <= stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)) 
+				&& (stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)) <= 32)))
 		{
 			for (int i = 0; i < MAX_ITEM; i++)
 			{
@@ -115,6 +129,8 @@ AbstractScene* GameMain::Update()
 		}
 	}
 
+	HitChack();
+
 	return this;
 }
 
@@ -143,5 +159,27 @@ void GameMain::Draw() const
 	}
 	//DrawFormatString(400, 300, 0x000000, "move_vector %d", mario->GetMoveVector());
 #endif // DEBUG
+
+}
+
+void GameMain::HitChack()
+{
+	//マリオとアイテムの当たり判定
+	for (int i = 0; i < MAX_ITEM; i++)
+	{
+		if (item[i] != nullptr)
+		{
+			//当たった時
+			if (mario->ChackHitBox(item[i]->GetLocation(), item[i]->GetSizeX()
+				, item[i]->GetSizeY(),stage.GetScroll()))
+			{
+				mario->Hit(item[i]->GetItemType());
+
+				//アイテムを消す
+				delete item[i];
+				item[i] = nullptr;
+			}
+		}
+	}
 
 }

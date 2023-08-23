@@ -62,6 +62,11 @@ private:
 	int b_Block;          //ブラックブロック
 	int b_Floor;          //地下のフロアブロック
 	int Pipe[4];          //土管
+	int Pole;			  //ポール
+	int Pole_Top;		  //ポールの先端
+	int Pole_Flg;		  //ポールの旗
+	int Castle;			  //城
+	int Flag;			  //旗
 
 	/*背景の画像を入れる変数*/
 	int BackImages[16];

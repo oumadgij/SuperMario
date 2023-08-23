@@ -4,9 +4,10 @@
 enum class STATE
 {
 	SMALL = 0,  //ちびマリオ
-	BIG,    //でかマリオ
-	FIRE,   //ファイアマリオ
-	STAR    //無敵状態
+	BIG,        //でかマリオ
+	FIRE,       //ファイアマリオ
+	STAR_SMALL, //無敵状態(小)
+	STAR_BIG	//無敵状態(大)
 };
 
 enum class MOVE_STATE
@@ -26,8 +27,9 @@ public:
 
 	void Update();
 	void Draw()const;
-	virtual void Hit()override;
-	void HitStage(int h_block, int w_block, int hit_side);  //判定後の処理
+	void Hit(int item_type);
+	virtual void HitStage(int h_block, int w_block
+		, int hit_side, int scroll)override;  //判定後の処理
 	virtual void Fall()override;  //降下処理
 	float GetSpeed()const { return Speed; }
 	int GetStage()const { return (int)State; }
@@ -43,10 +45,18 @@ private:
 	void PreparingJump();    //ジャンプの準備
 	void Jump();
 	void Animation();
+	int LoadImages();
 
 private:
-	int s_marioImg[10];
-	int b_marioImg[10];
+	//画像用変数
+	int sMario[10];  //小さいマリオ
+	int bMario[10];  //大きいマリオ
+	int fMario[10];  //ファイアマリオ
+	int Star_bMario[36];//大きいマリオ(スター)
+	int Star_sMario[32];//小さいマリオ(スター)
+
+	int Coin;            //コインの数
+	int Life;            //ライフ数
 	float Inertia;       //慣性
 	bool Jumping;        //ジャンプしているか(true：ジャンプしている false：ジャンプしていない)
 	STATE State;         //マリオの状態
@@ -72,7 +82,6 @@ private:
 	bool Turn = false;   //反転するかどうか (true：する false：しない)
 
 	//TO DO いづれ消す
-	int mari = 0;
 	//ここまで
 };
 

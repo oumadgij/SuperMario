@@ -5,6 +5,8 @@ class BoxCollider
 {
 public:
 	//void HitStage();  //”»’èŒã‚Ìˆ—
+	bool ChackHitBox(VECTOR location, int x_size, int y_size,int scroll);
+
 protected:
 
 	VECTOR Location;  //‰æ‘œ¶ã‚ÌÀ•W
