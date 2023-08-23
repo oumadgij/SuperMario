@@ -19,7 +19,7 @@ Mario::Mario()
 	XSize = SMALL_MARIO_SIZE;
 	YSize = SMALL_MARIO_SIZE;
 	Location.x = 3 * BLOCK_SIZE;
-	Location.y = 12 * BLOCK_SIZE+YSize/2;
+	Location.y = 12 * BLOCK_SIZE + YSize / 2;
 	Speed = 0.0f;
 	Inertia = 0.2f;
 	AnimWait = 0;
@@ -294,7 +294,8 @@ void Mario::HitStage(int h_block, int w_block
 void Mario::Fall()
 {
 	Move = MOVE_VECTOR::DOWN;
-	Location.y += MaxFallSpeed;
+	IsAir = true;
+	//Location.y += MaxFallSpeed;
 }
 
 //スピードを上げる
