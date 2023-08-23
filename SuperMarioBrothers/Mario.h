@@ -44,7 +44,7 @@ private:
 	void SpeedReduction();   //減速する
 	void PreparingJump();    //ジャンプの準備
 	void Jump();
-	void Animation();
+	virtual void Animation()override;
 	int LoadImages();
 
 private:
@@ -60,6 +60,7 @@ private:
 	float Inertia;       //慣性
 	bool Jumping;        //ジャンプしているか(true：ジャンプしている false：ジャンプしていない)
 	STATE State;         //マリオの状態
+	STATE SaveState;     //マリオの状態を保存する
 	MOVE_STATE mState;   //動くときの状態(歩くか走るか)
 
 	/*ジャンプの変数*/
@@ -75,11 +76,12 @@ private:
 	float XSpeed = 0.0f;  //x軸の速度
 	float IncrementalAcceleration = 0.0f;  //加速度の増加値
 	int sec = 0;
-	/*アニメーションの変数*/
-	int AnimSpeed = 10;  //画像切り替えスピード
-	int AnimWait;
-	int aIndex = 0;      //画像の添え字
-	bool Turn = false;   //反転するかどうか (true：する false：しない)
+
+	/*アニメーション変数*/
+	int StarLimit = 720;
+	int StarTime = 0;
+	const int DownSpeedTime = 120;
+	int H = 0;
 
 	//TO DO いづれ消す
 	//ここまで

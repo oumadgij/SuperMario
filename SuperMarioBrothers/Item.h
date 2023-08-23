@@ -28,8 +28,11 @@ public:
 	void Fall();
 	//進行方向を反転
 	void Inversion(); 
-	int GetItemType()const { return static_cast<int>(ItemType); }
+	//アニメーション
+	virtual void Animation()override;
 
+	int GetItemType()const { return static_cast<int>(ItemType); }
+	bool GetCoinUpEnd()const { return UpEnd; }
 	//to do
 	
 	//消す

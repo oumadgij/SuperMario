@@ -23,6 +23,10 @@ public:
 	virtual void Draw() const override;
 
 	void HitChack();
+	void DeleteItem(int i) {
+		delete item[i]; 
+		item[i] = nullptr;
+	}
 
 private:
 	Stage stage;

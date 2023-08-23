@@ -65,7 +65,7 @@ Item::Item(int block_y, int block_x
 
 	if (ItemType == ITEM_TYPE::COIN)
 	{
-		UpSpeed = 3.0f;
+		UpSpeed = 5.0f;
 	}
 	else
 	{
@@ -88,7 +88,7 @@ void Item::Update()
 		Location.y -= UpSpeed;
 		if (ItemType == ITEM_TYPE::COIN)
 		{
-			if (Location.y < StartLocate.y - BLOCK_SIZE * 2)
+			if (Location.y < StartLocate.y - BLOCK_SIZE * 3)
 			{
 				UpSpeed = -UpSpeed;
 			}
@@ -103,7 +103,15 @@ void Item::Update()
 		{
 			if (Location.y < StartLocate.y - BLOCK_SIZE)
 			{
-				Move = MOVE_VECTOR::RIGHT;
+				//スターの時MoveをUPにする
+				if (ItemType == ITEM_TYPE::STAR)
+				{
+					Move = MOVE_VECTOR::UP;
+				}
+				else
+				{
+					Move = MOVE_VECTOR::RIGHT;
+				}
 				UpEnd = true;
 			}
 		}
@@ -118,10 +126,21 @@ void Item::Update()
 			Location.x += Speed;
 		}
 
+		if (ItemType == ITEM_TYPE::STAR && Move == MOVE_VECTOR::UP)
+		{
+			Location.y -= UpSpeed;
+		}
+
 		if (Move == MOVE_VECTOR::DOWN)
 		{
 			Location.y += FallSpeed;
 		}
+	}
+
+	//キノコ・1UPキノコ以外はアニメーションを更新する
+	if (ItemType != ITEM_TYPE::MUSHROOM && ItemType != ITEM_TYPE::UP_MUSHROOM)
+	{
+		Animation();
 	}
 }
 
@@ -137,16 +156,16 @@ void Item::Draw(int scroll) const
 		DrawGraph(Location.x- scroll, Location.y, UP_Mushroom, TRUE);
 		break;
 	case ITEM_TYPE::COIN:
-		DrawGraph(Location.x - scroll, Location.y, Coin[0], TRUE);
+		DrawGraph(Location.x - scroll, Location.y, Coin[aIndex], TRUE);
 		break;
 	case ITEM_TYPE::M_COIN:
-		DrawGraph(Location.x - scroll, Location.y, M_Coin[0], TRUE);
+		DrawGraph(Location.x - scroll, Location.y, M_Coin[aIndex], TRUE);
 		break;
 	case ITEM_TYPE::FLOWER:
-		DrawGraph(Location.x - scroll, Location.y, Flower[0], TRUE);
+		DrawGraph(Location.x - scroll, Location.y, Flower[aIndex], TRUE);
 		break;
 	case ITEM_TYPE::STAR:
-		DrawGraph(Location.x - scroll, Location.y, Star[0], TRUE);
+		DrawGraph(Location.x - scroll, Location.y, Star[aIndex], TRUE);
 		break;
 	}
 
@@ -191,6 +210,11 @@ void Item::HitStage(int h_block, int w_block
 			Move = MOVE_VECTOR::RIGHT;
 		}
 		break;
+	case 4: //下側
+		Location.y = vec.y + YSize;
+		//降下準備
+		Move = MOVE_VECTOR::DOWN;
+		break;
 	}
 }
 
@@ -213,6 +237,18 @@ void Item::Inversion()
 	}
 
 	Speed *= -1;
+}
+
+void Item::Animation()
+{
+	if (AnimSpeed/4 < ++AnimWait)
+	{
+		if (3 < ++aIndex)
+		{
+			aIndex = 0;
+		}
+		AnimWait = 0;
+	}
 }
 
 int Item::LoadImages()

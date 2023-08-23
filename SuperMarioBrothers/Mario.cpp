@@ -26,6 +26,7 @@ Mario::Mario()
 	Coin = 0;
 	Life = 3;
 	State = STATE::SMALL;
+	SaveState = STATE::SMALL;
 	Move = MOVE_VECTOR::STOP;
 	mState = MOVE_STATE::WALK;
 	if (LoadImages() == -1)
@@ -126,6 +127,14 @@ void Mario::Update()
 	/*アニメーション*/
 	Animation();
 
+	/*スターの時間が切れたら元の状態に戻す*/
+	if (State == STATE::STAR_BIG || State == STATE::STAR_SMALL)
+	{
+		if (--StarLimit < 0)
+		{
+			State = SaveState;
+		}
+	}
 #define DEBUG
 #ifndef DEBUG
 #endif // !DEBUG
@@ -146,10 +155,10 @@ void Mario::Draw() const
 		DrawRotaGraphF(Location.x, Location.y, 1, 0, fMario[aIndex], TRUE, Turn);
 		break;
 	case STATE::STAR_SMALL:
-		DrawRotaGraphF(Location.x, Location.y, 1, 0, Star_sMario[aIndex], TRUE, Turn);
+		DrawRotaGraphF(Location.x, Location.y, 1, 0, Star_sMario[aIndex + H * 8], TRUE, Turn);
 		break;
 	case STATE::STAR_BIG:
-		DrawRotaGraphF(Location.x, Location.y, 1, 0, Star_bMario[aIndex], TRUE, Turn);
+		DrawRotaGraphF(Location.x, Location.y, 1, 0, Star_bMario[aIndex + H * 9], TRUE, Turn);
 		break;
 	}
 
@@ -193,10 +202,17 @@ void Mario::Hit(int item_type)
 	switch (item_type)
 	{
 	case 1: //キノコ
-		State = STATE::BIG;
-		Location.y = 11 * BLOCK_SIZE + BLOCK_SIZE;
 		YSize = BIG_MARIO_HEIGTH_SIZE;
 		XSize = BIG_MARIO_WIDTH_SIZE;
+		//状態を変更する
+		if (State == STATE::STAR_SMALL)
+		{
+			State = STATE::STAR_BIG;
+		}
+		else
+		{
+			State = STATE::BIG;
+		}
 		break;
 	case 2: //1UPキノコ
 		++Life;
@@ -208,20 +224,33 @@ void Mario::Hit(int item_type)
 	case 5: //フラワー
 		if (State == STATE::SMALL)//マリオが小さい時
 		{
-			Location.y = 11 * BLOCK_SIZE + BLOCK_SIZE;
 			YSize = BIG_MARIO_HEIGTH_SIZE;
 			XSize = BIG_MARIO_WIDTH_SIZE;
 		}
-		State = STATE::FIRE;
+
+		//状態を変更する
+		//スター状態の時SaveStateを変更する
+		if (State == STATE::STAR_SMALL || State == STATE::STAR_BIG)
+		{
+			SaveState = STATE::FIRE;
+		}
+		else
+		{
+			State = STATE::FIRE;
+		}
 		break;
 	case 6: //スター
 		if (State == STATE::SMALL)//マリオが小さい時
 		{
+			SaveState = State;
 			State = STATE::STAR_SMALL;
+			StarLimit = 720;
 		}
 		else
 		{
+			SaveState = State;
 			State = STATE::STAR_BIG;
+			StarLimit = 720;
 		}
 		break;
 	}
@@ -504,6 +533,34 @@ void Mario::Animation()
 	else
 	{
 		aIndex = 0;
+	}
+
+	//スター状態の時、マリオをちかちかさせる
+	if (State == STATE::STAR_BIG || State == STATE::STAR_SMALL)
+	{
+		//スター状態終了2秒前
+		if (StarLimit < DownSpeedTime)
+		{
+			if (AnimSpeed / 2 < ++StarTime)
+			{
+				if (3 < ++H)
+				{
+					H = 0;
+				}
+				StarTime = 0;
+			}
+		}
+		else
+		{
+			if (AnimSpeed / 6 < ++StarTime)
+			{
+				if (3 < ++H)
+				{
+					H = 0;
+				}
+				StarTime = 0;
+			}
+		}
 	}
 }
 

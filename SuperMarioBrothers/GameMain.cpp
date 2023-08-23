@@ -69,19 +69,19 @@ AbstractScene* GameMain::Update()
 		//アイテムがあるブロックの時、アイテムを実体化
 		if (stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)) == 3
 			|| stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)) == 5
-			|| (30 <= stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)) 
-				&& (stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)) <= 32)))
+			|| (30 <= stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1))
+			&& stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)) <= 32))
 		{
 			for (int i = 0; i < MAX_ITEM; i++)
-			{
-				if (item[i] == nullptr)
 				{
-					item[i] = new Item(stage.GetPushBlock(0), stage.GetPushBlock(1)
-						, stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)), mario->GetStage()
-						, stage.GetScroll());
-					break;
+					if (item[i] == nullptr)
+					{
+						item[i] = new Item(stage.GetPushBlock(0), stage.GetPushBlock(1)
+							, stage.GetStage(stage.GetHitBlock(0) - 1, stage.GetHitBlock(1)), mario->GetStage()
+							, stage.GetScroll());
+						break;
+					}
 				}
-			}
 		}
 	}
 	else
@@ -98,6 +98,14 @@ AbstractScene* GameMain::Update()
 		if (item[i] != nullptr)
 		{
 			item[i]->Update();
+
+			//コインの出現演出が終わったらコインの数を増やしてコインを消す
+			if (item[i]->GetItemType() == 3 && item[i]->GetCoinUpEnd())
+			{
+				mario->Hit(item[i]->GetItemType());
+				DeleteItem(i);
+				continue;
+			}
 
 			//アイテムのステージヒットチェック事前準備
 			stage.ItemChackStagePreparation(item[i]->GetLocation()
@@ -123,8 +131,7 @@ AbstractScene* GameMain::Update()
 			//アイテムが画面外に行ったらアイテムを消す
 			if (item[i]->GetLocation().x - stage.GetScroll() < -100)
 			{
-				delete item[i];
-				item[i] = nullptr;
+				DeleteItem(i);
 			}
 		}
 	}
@@ -176,8 +183,7 @@ void GameMain::HitChack()
 				mario->Hit(item[i]->GetItemType());
 
 				//アイテムを消す
-				delete item[i];
-				item[i] = nullptr;
+				DeleteItem(i);
 			}
 		}
 	}
