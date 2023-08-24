@@ -16,6 +16,8 @@ GameMain::GameMain()
 
 AbstractScene* GameMain::Update()
 {
+	ui.CountDown();
+
 	//マリオのアップデート
 	mario->Update();
 
@@ -102,7 +104,7 @@ AbstractScene* GameMain::Update()
 			//コインの出現演出が終わったらコインの数を増やしてコインを消す
 			if (item[i]->GetItemType() == 3 && item[i]->GetCoinUpEnd())
 			{
-				mario->Hit(item[i]->GetItemType());
+				ui.AddCoin();
 				DeleteItem(i);
 				continue;
 			}
@@ -152,6 +154,7 @@ void GameMain::Draw() const
 			item[i]->Draw(stage.GetScroll());
 		}
 	}
+	ui.Draw();
 
 #define DEBUG
 #ifdef DEBUG
@@ -180,8 +183,15 @@ void GameMain::HitChack()
 			if (mario->ChackHitBox(item[i]->GetLocation(), item[i]->GetSizeX()
 				, item[i]->GetSizeY(),stage.GetScroll()))
 			{
-				mario->Hit(item[i]->GetItemType());
-
+				if (item[i]->GetItemType() == 3 || item[i]->GetItemType() == 4)
+				{
+					ui.AddCoin();
+				}
+				else
+				{
+					mario->Hit(item[i]->GetItemType());
+				}
+				
 				//アイテムを消す
 				DeleteItem(i);
 			}

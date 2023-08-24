@@ -55,7 +55,6 @@ private:
 	int Star_bMario[36];//大きいマリオ(スター)
 	int Star_sMario[32];//小さいマリオ(スター)
 
-	int Coin;            //コインの数
 	int Life;            //ライフ数
 	float Inertia;       //慣性
 	bool Jumping;        //ジャンプしているか(true：ジャンプしている false：ジャンプしていない)

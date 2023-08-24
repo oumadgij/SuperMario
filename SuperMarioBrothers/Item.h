@@ -38,6 +38,8 @@ public:
 	//消す
 
 private:
+	//スターがジャンプする
+	void StarJump();
 	int LoadImages();
 
 	//画像用変数
@@ -52,8 +54,17 @@ private:
 	VECTOR StartLocate;
 	int Locate[2];  //アイテムを出す位置 0：縦 1：横
 	float UpSpeed;  //出現するスピード
-	float FallSpeed;  //落下スピード
 	bool UpEnd;     //アイテム出現完了か?
+
+	//ジャンプ
+	float FallSpeed;  //落下スピード
+	float kasokudo = 0.156f;    //加速度
+	float YSpeed = -6.0f;  //y軸の速度
+	float XSpeed = 0.0f;  //x軸の速度
+	float IncrementalAcceleration = 0.156f;  //加速度の増加値
+	int sec = 0;
+
+	 
 	//to do
 	
 	//消す

@@ -103,16 +103,9 @@ void Item::Update()
 		{
 			if (Location.y < StartLocate.y - BLOCK_SIZE)
 			{
-				//スターの時MoveをUPにする
-				if (ItemType == ITEM_TYPE::STAR)
-				{
-					Move = MOVE_VECTOR::UP;
-				}
-				else
-				{
-					Move = MOVE_VECTOR::RIGHT;
-				}
+				Move = MOVE_VECTOR::RIGHT;
 				UpEnd = true;
+				kasokudo = IncrementalAcceleration;
 			}
 		}
 	}
@@ -126,9 +119,10 @@ void Item::Update()
 			Location.x += Speed;
 		}
 
-		if (ItemType == ITEM_TYPE::STAR && Move == MOVE_VECTOR::UP)
+		if (ItemType == ITEM_TYPE::STAR)
 		{
-			Location.y -= UpSpeed;
+			IsAir = true;
+			StarJump();
 		}
 
 		if (Move == MOVE_VECTOR::DOWN)
@@ -171,6 +165,8 @@ void Item::Draw(int scroll) const
 
 #define DEBUG
 #ifdef DEBUG
+	DrawFormatString(0, 200, 0xffffff, "yspeed %d", YSpeed);
+
 	DrawBox(Location.x - scroll, Location.y, Location.x + XSize-scroll, Location.y + YSize, 0xff0000, FALSE);
 	DrawFormatString(0, 150, 0xffffff, "IMoveVector %d", (int)Move);
 	DrawFormatString(0, 20, 0xffffff, "左上 X %d Y %d", ((int)Location.x-XSize/2) / BLOCK_SIZE,((int)Location.y-YSize/2)/BLOCK_SIZE);
@@ -186,16 +182,16 @@ void Item::HitStage(int h_block, int w_block
 	VECTOR vec;
 
 	vec.y = static_cast<float>(h_block * BLOCK_SIZE);
-	vec.x = static_cast<float>(w_block * BLOCK_SIZE) + scroll;
+	vec.x = static_cast<float>(w_block * BLOCK_SIZE);
 
 	switch (hit_side) //当たったブロックの辺の位置
 	{
 	case 1:  //左側
-		Location.x = vec.x - BLOCK_SIZE;
+		Location.x = vec.x - BLOCK_SIZE+scroll;
 		Inversion();
 		break;
 	case 2: //右側
-		Location.x = vec.x + BLOCK_SIZE;
+		Location.x = vec.x + BLOCK_SIZE + scroll;
 		Inversion();
 		break;
 	case 3:   //上側
@@ -208,6 +204,11 @@ void Item::HitStage(int h_block, int w_block
 		else
 		{
 			Move = MOVE_VECTOR::RIGHT;
+		}
+
+		if (ItemType == ITEM_TYPE::STAR)
+		{
+			kasokudo = -IncrementalAcceleration;
 		}
 		break;
 	case 4: //下側
@@ -249,6 +250,30 @@ void Item::Animation()
 		}
 		AnimWait = 0;
 	}
+}
+
+void Item::StarJump()
+{
+	//距離を求める    1フレーム = 0.016秒
+	//Y座標
+	YSpeed += kasokudo;
+
+	Location.y += YSpeed;
+
+	//X座標
+	//Location.x += XSpeed * 0.016;
+
+	//下降するタイミングを判断
+	if (0 < YSpeed)
+	{
+		kasokudo = IncrementalAcceleration;
+	}
+
+	/*float Ground = 12 * BLOCK_SIZE - YSize;
+	if (Ground < Location.y)
+	{
+		kasokudo = IncrementalAcceleration;
+	}*/
 }
 
 int Item::LoadImages()

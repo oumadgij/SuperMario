@@ -23,7 +23,6 @@ Mario::Mario()
 	Speed = 0.0f;
 	Inertia = 0.2f;
 	AnimWait = 0;
-	Coin = 0;
 	Life = 3;
 	State = STATE::SMALL;
 	SaveState = STATE::SMALL;
@@ -212,14 +211,11 @@ void Mario::Hit(int item_type)
 		else
 		{
 			State = STATE::BIG;
+			Location.y = Location.y - BLOCK_SIZE / 2;
 		}
 		break;
 	case 2: //1UPキノコ
 		++Life;
-		break;
-	case 3: //コイン
-	case 4:
-		++Coin;
 		break;
 	case 5: //フラワー
 		if (State == STATE::SMALL)//マリオが小さい時
@@ -426,23 +422,23 @@ void Mario::Jump()
 		Move = MOVE_VECTOR::DOWN;
 	}
 
-	float Ground = 0.0f;
-	//地面に着地したか判断
-	if (State == STATE::SMALL)
-	{
-		Ground = 12 * BLOCK_SIZE+BLOCK_SIZE/2;
-	}
-	else
-	{
-		Ground = 12 * BLOCK_SIZE+BLOCK_SIZE;
-	}
-	
-	if (Ground < Location.y)
-	{
-		Location.y = Ground;
-		Jumping = false;
-		IsAir = false;
-	}
+	//float Ground = 0.0f;
+	////地面に着地したか判断
+	//if (State == STATE::SMALL)
+	//{
+	//	Ground = 12 * BLOCK_SIZE+BLOCK_SIZE/2;
+	//}
+	//else
+	//{
+	//	Ground = 12 * BLOCK_SIZE+BLOCK_SIZE;
+	//}
+	//
+	//if (Ground < Location.y)
+	//{
+	//	Location.y = Ground;
+	//	Jumping = false;
+	//	IsAir = false;
+	//}
 }
 
 void Mario::Animation()
