@@ -12,10 +12,10 @@
 
 Mario::Mario()
 {
-	//TO DO いつか消す
-	flg = false;
+	////TO DO いつか消す
+	//flg = false;
+	////ここまで
 	Jumping = true;
-	//ここまで
 	XSize = SMALL_MARIO_SIZE;
 	YSize = SMALL_MARIO_SIZE;
 	Location.x = 3 * BLOCK_SIZE;
@@ -63,7 +63,7 @@ void Mario::Update()
 		Turn = false;
 	}
 	//ジャンプ
-	if (Jumping && PadInput::OnClick(XINPUT_BUTTON_B))
+	if (Move!=MOVE_VECTOR::DOWN && Jumping && PadInput::OnClick(XINPUT_BUTTON_B))
 	{
 		PreparingJump();
 		Move = MOVE_VECTOR::UP;
@@ -161,6 +161,8 @@ void Mario::Draw() const
 		break;
 	}
 
+#define DEBUG
+#ifndef DEBUG
 	if (flg)
 	{
 		DrawBox(Location.x - XSize / 2, Location.y - YSize / 2, Location.x + XSize / 2, Location.y + YSize / 2, 0xff0000, FALSE);
@@ -169,9 +171,6 @@ void Mario::Draw() const
 	{
 		DrawBox(Location.x - XSize / 2, Location.y - XSize / 2, Location.x + XSize / 2, Location.y + YSize / 2, 0x0000ff, FALSE);
 	}
-
-#define DEBUG
-#ifdef DEBUG
 	DrawFormatString(0, 90, 0xffffff, "M左上のステージ位置\nX %d Y %d", static_cast<int>((Location.x-XSize/2) / BLOCK_SIZE), static_cast<int>((Location.y-YSize/2) / BLOCK_SIZE));
 	DrawFormatString(0, 130, 0xffffff, "M右下のステージ位置\nX %d Y %d", static_cast<int>((Location.x + XSize/2) / BLOCK_SIZE), static_cast<int>((Location.y + YSize/2) / BLOCK_SIZE));
 	//DrawFormatString(400, 10, 0x000000, "X %f Y %f", Location.x, Location.y);
@@ -264,19 +263,15 @@ void Mario::HitStage(int h_block, int w_block
 	{
 	case 1:  //左側
 		Location.x = vec.x - BLOCK_SIZE / 2;
-		flg = false;
 		break;
 	case 2: //右側
 		Location.x = vec.x + BLOCK_SIZE / 2;
-		flg = false;
 		break;
 	case 3:   //上側
 		Location.y = vec.y - YSize / 2;
 		Move = MOVE_VECTOR::STOP;
 		IsAir = false;
 		Jumping = false;
-		flg = false;
-
 		break;
 	case 4: //下側
 		Location.y = vec.y + YSize;
@@ -421,24 +416,6 @@ void Mario::Jump()
 		kasokudo += Fallkasokudo;
 		Move = MOVE_VECTOR::DOWN;
 	}
-
-	//float Ground = 0.0f;
-	////地面に着地したか判断
-	//if (State == STATE::SMALL)
-	//{
-	//	Ground = 12 * BLOCK_SIZE+BLOCK_SIZE/2;
-	//}
-	//else
-	//{
-	//	Ground = 12 * BLOCK_SIZE+BLOCK_SIZE;
-	//}
-	//
-	//if (Ground < Location.y)
-	//{
-	//	Location.y = Ground;
-	//	Jumping = false;
-	//	IsAir = false;
-	//}
 }
 
 void Mario::Animation()

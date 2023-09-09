@@ -52,7 +52,6 @@ private:
 
 	ITEM_TYPE ItemType = ITEM_TYPE::DEFAULT;
 	VECTOR StartLocate;
-	int Locate[2];  //アイテムを出す位置 0：縦 1：横
 	float UpSpeed;  //出現するスピード
 	bool UpEnd;     //アイテム出現完了か?
 

@@ -10,10 +10,6 @@ Item::Item()
 	UpSpeed = 0.0f;
 	Speed = 1.0f;
 	Move = MOVE_VECTOR::STOP;
-	for (int i = 0; i < 2; i++)
-	{
-		Locate[i] = -1;
-	}
 
 	//画像の読み込み
 	if (LoadImages() == -1)
@@ -32,10 +28,8 @@ Item::Item(int block_y, int block_x
 	FallSpeed = 4.0f;
 	XSize = BLOCK_SIZE;
 	YSize = BLOCK_SIZE;
-	Locate[0] = block_y;
-	Locate[1] = block_x;
-	Location.y = (float)Locate[0] * BLOCK_SIZE;
-	Location.x = (float)Locate[1] * BLOCK_SIZE;
+	Location.y = (float)block_y * BLOCK_SIZE;
+	Location.x = (float)block_x * BLOCK_SIZE;
 	StartLocate = Location;
 
 	switch (stage_num)
@@ -105,7 +99,7 @@ void Item::Update()
 			{
 				Move = MOVE_VECTOR::RIGHT;
 				UpEnd = true;
-				kasokudo = IncrementalAcceleration;
+				//kasokudo = IncrementalAcceleration;
 			}
 		}
 	}
@@ -114,20 +108,24 @@ void Item::Update()
 	//コインとフラワー以外は移動させる
 	if (ItemType != ITEM_TYPE::COIN && ItemType != ITEM_TYPE::FLOWER)
 	{
-		if (UpEnd && Move != MOVE_VECTOR::STOP)
-		{
-			Location.x += Speed;
-		}
 
-		if (ItemType == ITEM_TYPE::STAR)
+		if (UpEnd)
 		{
-			IsAir = true;
-			StarJump();
-		}
+			if (Move != MOVE_VECTOR::STOP)
+			{
+				Location.x += Speed;
+			}
 
-		if (Move == MOVE_VECTOR::DOWN)
-		{
-			Location.y += FallSpeed;
+			/*if (ItemType == ITEM_TYPE::STAR)
+			{
+				IsAir = true;
+				StarJump();
+			}*/
+
+			if (Move == MOVE_VECTOR::DOWN)
+			{
+				Location.y += FallSpeed;
+			}
 		}
 	}
 
@@ -144,27 +142,26 @@ void Item::Draw(int scroll) const
 	{
 	case ITEM_TYPE::MUSHROOM:
 		DrawGraphF(Location.x - scroll, Location.y, Mushroom, TRUE);
-		//DrawGraph(Location.x - scroll, Location.y, Mushroom, TRUE);
 		break;
 	case ITEM_TYPE::UP_MUSHROOM:
-		DrawGraph(Location.x- scroll, Location.y, UP_Mushroom, TRUE);
+		DrawGraphF(Location.x- scroll, Location.y, UP_Mushroom, TRUE);
 		break;
 	case ITEM_TYPE::COIN:
-		DrawGraph(Location.x - scroll, Location.y, Coin[aIndex], TRUE);
+		DrawGraphF(Location.x - scroll, Location.y, Coin[aIndex], TRUE);
 		break;
 	case ITEM_TYPE::M_COIN:
-		DrawGraph(Location.x - scroll, Location.y, M_Coin[aIndex], TRUE);
+		DrawGraphF(Location.x - scroll, Location.y, M_Coin[aIndex], TRUE);
 		break;
 	case ITEM_TYPE::FLOWER:
-		DrawGraph(Location.x - scroll, Location.y, Flower[aIndex], TRUE);
+		DrawGraphF(Location.x - scroll, Location.y, Flower[aIndex], TRUE);
 		break;
 	case ITEM_TYPE::STAR:
-		DrawGraph(Location.x - scroll, Location.y, Star[aIndex], TRUE);
+		DrawGraphF(Location.x - scroll, Location.y, Star[aIndex], TRUE);
 		break;
 	}
 
 #define DEBUG
-#ifdef DEBUG
+#ifndef DEBUG
 	DrawFormatString(0, 200, 0xffffff, "yspeed %d", YSpeed);
 
 	DrawBox(Location.x - scroll, Location.y, Location.x + XSize-scroll, Location.y + YSize, 0xff0000, FALSE);
@@ -195,6 +192,9 @@ void Item::HitStage(int h_block, int w_block
 		Inversion();
 		break;
 	case 3:   //上側
+		//出現演出が終わっていなかったら座標修正はしない
+		if (!UpEnd) break;
+
 		Location.y = vec.y - YSize;
 		IsAir = false;
 		if (Speed < 0) //進行方向にMoveを変更
@@ -268,12 +268,6 @@ void Item::StarJump()
 	{
 		kasokudo = IncrementalAcceleration;
 	}
-
-	/*float Ground = 12 * BLOCK_SIZE - YSize;
-	if (Ground < Location.y)
-	{
-		kasokudo = IncrementalAcceleration;
-	}*/
 }
 
 int Item::LoadImages()

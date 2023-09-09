@@ -16,7 +16,7 @@ GameMain::GameMain()
 
 AbstractScene* GameMain::Update()
 {
-	ui.CountDown();
+	ui.Update();
 
 	//マリオのアップデート
 	mario->Update();
@@ -47,7 +47,6 @@ AbstractScene* GameMain::Update()
 		//マリオの位置を戻す
 		mario->HitStage(stage.GetHitBlock(0), stage.GetHitBlock(1)
 			, stage.GetHitSide(), 0);
-		mario->flg = true;
 
 		//当たった辺が下の時、ブロックを動かす準備をする
 		if (stage.GetHitSide() == 4)
@@ -86,10 +85,6 @@ AbstractScene* GameMain::Update()
 				}
 		}
 	}
-	else
-	{
-		mario->flg = false;
-	}
 
 	//ブロックが動く
 	stage.MoveBlock();
@@ -101,10 +96,14 @@ AbstractScene* GameMain::Update()
 		{
 			item[i]->Update();
 
-			//コインの出現演出が終わったらコインの数を増やしてコインを消す
+			//コインの出現演出が終わったらコインの数と
+			//スコアを増やしてコインを消す
 			if (item[i]->GetItemType() == 3 && item[i]->GetCoinUpEnd())
 			{
 				ui.AddCoin();
+				ui.AddScore(item[i]->GetItemType());
+				ui.Instantiation(item[i]->GetLocation(), stage.GetScroll()
+					, item[i]->GetSizeX(), item[i]->GetItemType() - 1);
 				DeleteItem(i);
 				continue;
 			}
@@ -138,6 +137,7 @@ AbstractScene* GameMain::Update()
 		}
 	}
 
+	//マリオとアイテムの当たり判定
 	HitChack();
 
 	return this;
@@ -157,7 +157,7 @@ void GameMain::Draw() const
 	ui.Draw();
 
 #define DEBUG
-#ifdef DEBUG
+#ifndef DEBUG
 	DrawFormatString(400, 300, 0xffffff, "CStage %d", stage.GetStage(stage.GetHitBlock(0)-1, stage.GetHitBlock(1)));
 	
 	for (int i = 0; i < MAX_ITEM; i++)
@@ -183,14 +183,22 @@ void GameMain::HitChack()
 			if (mario->ChackHitBox(item[i]->GetLocation(), item[i]->GetSizeX()
 				, item[i]->GetSizeY(),stage.GetScroll()))
 			{
-				if (item[i]->GetItemType() == 3 || item[i]->GetItemType() == 4)
+				//コインだったら
+				if (item[i]->GetItemType() == 4)
 				{
 					ui.AddCoin();
+					ui.Instantiation(item[i]->GetLocation(), stage.GetScroll()
+						, item[i]->GetSizeX(), item[i]->GetItemType() - 1);
 				}
 				else
 				{
 					mario->Hit(item[i]->GetItemType());
+					ui.Instantiation(item[i]->GetLocation(), stage.GetScroll()
+						, item[i]->GetSizeX(), item[i]->GetItemType() - 1);
 				}
+
+				//スコアを増やす
+				ui.AddScore(item[i]->GetItemType());
 				
 				//アイテムを消す
 				DeleteItem(i);

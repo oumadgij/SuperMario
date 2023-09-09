@@ -418,16 +418,6 @@ bool Stage::ChackUnder()
 {
     int start = 0;
     int end = 1;
-  /*  for (int h = vertex[start][0]; h <= vertex[end][0]; h++)
-    {
-        for (int w = vertex[end][1]; w <= vertex[end][1]; w++)
-        {
-            if (ChackStage[h+1][w] == 0)
-            {
-                return true;
-            }
-        }
-    }*/
     int h = vertex[1][0];
     for (int w = vertex[start][1]; w <= vertex[end][1]; w++)
     {
@@ -450,8 +440,10 @@ void Stage::MoveBlockPreparation()
     PushEnd = false;
 
     //アイテムがある所は空ブロックにする
-    if (StageData[PushBlock[0]][PushBlock[1]] == 30
-        || StageData[PushBlock[0]][PushBlock[1]] == 3)
+    if (StageData[PushBlock[0]][PushBlock[1]] == 3
+        || StageData[PushBlock[0]][PushBlock[1]] == 5
+        || StageData[PushBlock[0]][PushBlock[1]] == 30
+        || StageData[PushBlock[0]][PushBlock[1]] == 32)
     {
         StageData[PushBlock[0]][PushBlock[1]] = 4;
     }

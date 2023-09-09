@@ -46,7 +46,6 @@ public:
 	int GetScroll()const { return ScrollX; }
 
 	//to do
-	bool GetPushEnd()const { return PushEnd; }
 	//消す
 private:
 	int StageData[15][211];    //ステージデータを入れる変数
@@ -80,13 +79,14 @@ private:
 	int down = 2;
 	int PushBlock[2] = { -1,-1 }; //押し出すブロック 0：縦 1：横
 	int ScrollX = 0;  //横スクロール
-
+	int play[2];
+	int ChackStage[15][20];
+	//押し出しが終わったか
+	//false ：終わっていない true：終わっている
+	bool PushEnd = false;  
 	//判定する自身の範囲
 	int vertex[2][2] = { {0,0},{0,0} };
 	//to do
-	int play[2];
-	int ChackStage[15][20];
-	bool PushEnd = false;  //押し出しが終わったか  false ：終わっていない true：終わっている
 	//消す
 };
 

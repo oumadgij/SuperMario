@@ -36,7 +36,7 @@ public:
 
 
 	//TO DOÇ¢Ç√ÇÍè¡Ç∑
-	bool flg;
+	//bool flg;
 	//Ç±Ç±Ç‹Ç≈
 
 private:
